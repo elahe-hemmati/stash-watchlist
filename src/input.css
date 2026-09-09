@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+/* :root {
+  --bg-image: url("/src/img/bg-dark.jpg");
+}
+
+.light {
+  --bg-image: url("/src/img/bg-light.jpg");
+} */
+@custom-variant dark (&:where(.dark, .dark *));
+@theme {
+  --background-image-main: var(--bg-image);
+
+  --color-light-cream: #faf6eb;
+  --color-dark-black: #090806;
+  --color-light-blue: #1b5891;
+  --color-dark-orange: #751505;
+}
+@custom-variant light (&:where(.light, .light *));
+
+/* h1 animation */
+@keyframes shine {
+  0% {
+    background-position: 200% 50%;
+  }
+
+  100% {
+    background-position: -200% 50%;
+  }
+}
+@keyframes bell {
+}
+/* @keyframes left-card {
+  0%,
+  20% {
+    transform: skewY(6deg) rotateY(-30deg) translateX(0) scale(0.7);
+  }
+
+  40%,
+  60% {
+    transform: skewY(0) rotateY(0) translateX(130px) scale(1);
+  }
+
+  80%,
+  100% {
+    transform: skewY(6deg) rotateY(-30deg) translateX(0) scale(0.7);
+  }
+}
+
+@keyframes center-card {
+  0%,
+  20% {
+    transform: translateX(0) scale(1);
+  }
+
+  40%,
+  60% {
+    transform: translateX(-150px) scale(0.7);
+  }
+
+  80%,
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes right-card {
+  0%,
+  20% {
+    transform: skewY(-6deg) rotateY(30deg) translateX(0) scale(0.7);
+  }
+
+  40%,
+  60% {
+    transform: skewY(0) rotateY(0) translateX(-130px) scale(1);
+  }
+
+  80%,
+  100% {
+    transform: skewY(-6deg) rotateY(30deg) translateX(0) scale(0.7);
+  }
+} */
