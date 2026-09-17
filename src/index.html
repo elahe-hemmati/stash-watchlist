@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -39,7 +39,7 @@
             type="button"
             class="btn-nav--open rounded-md p-2 text-center hover:bg-gray-200/50 dark:hover:bg-gray-600/50"
           >
-            <img src="./img/menu.svg" alt="menu" class="h-5 w-5" />
+            <img src="./img/icons/menu.svg" alt="menu" class="h-5 w-5" />
           </button>
         </nav>
         <!-- Nav Overlay -->
@@ -49,7 +49,7 @@
 
         <!-- Sidebar -->
         <aside
-          class="aside dark:border-light-cream/20 border-dark-black/20 bg-light-cream dark:bg-dark-black absolute top-0 left-0 z-100 flex h-screen w-[10rem] -translate-x-full flex-col gap-4 border-r-1 p-3 transition-transform duration-500 lg:sticky lg:top-0 lg:w-[clamp(3rem,5vw,4.5rem)] lg:translate-x-0 lg:bg-white/40 lg:transition-[width] lg:duration-500 lg:dark:bg-black/40"
+          class="aside dark:border-light-cream/20 border-dark-black/20 bg-light-cream dark:bg-dark-black fixed top-0 left-0 z-100 flex h-screen w-[10rem] -translate-x-full flex-col gap-4 border-r-1 p-3 transition-transform duration-500 lg:sticky lg:top-0 lg:w-[clamp(3rem,5vw,4.5rem)] lg:translate-x-0 lg:bg-white/40 lg:transition-[width] lg:duration-500 lg:dark:bg-black/40"
         >
           <!-- Close Nav BTN -->
           <div class="aside-head flex flex-row justify-between">
@@ -67,7 +67,7 @@
               type="button"
               class="btn-nav--close rounded-md p-2 text-center text-sm leading-5 font-medium hover:bg-gray-200/50 lg:hidden dark:hover:bg-gray-600/50"
             >
-              <img src="./img/close.svg" alt="menu" class="h-5 w-5" />
+              <img src="./img/icons/close.svg" alt="menu" class="h-5 w-5" />
             </button>
           </div>
 
@@ -78,13 +78,13 @@
               class="btn-aside--toggle hidden h-[3rem] w-full grid-cols-[1.25rem_1fr] items-center justify-items-start gap-4 rounded-md p-2 text-sm leading-5 font-medium hover:bg-gray-200/50 lg:inline-grid dark:hover:bg-gray-600/50"
             >
               <img
-                src="./img/show_sidepanel.svg"
+                src="./img/icons/show_sidepanel.svg"
                 alt="show sidebar"
                 class="aside-icon--show col-start-1 row-start-1 h-5 w-5"
               />
 
               <img
-                src="./img/hide_sidepanel.svg"
+                src="./img/icons/hide_sidepanel.svg"
                 alt="hide sidebar"
                 class="aside-icon--hide col-start-1 row-start-1 hidden h-5 w-5"
               />
@@ -108,13 +108,13 @@
               class="btn-theme grid h-[3rem] w-full grid-cols-[1.25rem_1fr] items-center justify-items-start gap-3 rounded-md p-2 text-sm leading-5 font-medium hover:bg-gray-200/50 lg:inline-grid dark:hover:bg-gray-600/50"
             >
               <img
-                src="./img/sun.svg"
+                src="./img/icons/sun.svg"
                 alt="light theme"
                 class="light-theme col-start-1 row-start-1 h-5 w-5 transition-all duration-500"
               />
 
               <img
-                src="./img/moon.svg"
+                src="./img/icons/moon.svg"
                 alt="dark theme"
                 class="dark-theme col-start-1 row-start-1 h-5 w-5 scale-0 rotate-90 opacity-0 transition-all duration-500"
               />
@@ -139,7 +139,7 @@
               class="grid h-[3rem] w-full grid-cols-[1.25rem_1fr] items-center justify-items-start gap-4 rounded-md p-2 text-sm leading-5 font-medium hover:bg-gray-200/50 lg:inline-grid dark:hover:bg-gray-600/50"
             >
               <img
-                src="./img/video_playlist.svg"
+                src="./img/icons/video_playlist.svg"
                 alt="watchlist"
                 class="col-start-1 row-start-1 h-5 w-5"
               />
@@ -167,13 +167,101 @@
             <h1
               class="text-3xl leading-tight font-bold sm:text-4xl lg:text-5xl"
             >
-              Discover, save, and
-              <span
-                class="animate-[shine_7s_linear_infinite] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.5)_15%,transparent_45%),linear-gradient(to_right,#eab308,#fde047)] bg-[length:200%_100%,100%_100%] bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(250,204,21,0.35)]"
-              >
-                stash</span
-              >
-              the movies you never want to forget.
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
+                  style="animation-delay: 0s"
+                >
+                  Discover,
+                </span>
+              </span>
+
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
+                  style="animation-delay: 0.05s"
+                >
+                  save,
+                </span>
+              </span>
+
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
+                  style="animation-delay: 0.1s"
+                >
+                  and
+                </span>
+              </span>
+
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
+                  style="animation-delay: 0.15s"
+                >
+                  <span
+                    class="animate-[shine_7s_linear_infinite] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.5)_15%,transparent_45%),linear-gradient(to_right,#eab308,#fde047)] bg-[length:200%_100%,100%_100%] bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(250,204,21,0.35)]"
+                  >
+                    Stash
+                  </span>
+                </span>
+              </span>
+
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_1s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.25s]"
+                >
+                  the
+                </span>
+              </span>
+
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_1s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.3s]"
+                >
+                  movies
+                </span>
+              </span>
+
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_1s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.35s]"
+                >
+                  you
+                </span>
+              </span>
+
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_1s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.4s]"
+                >
+                  never
+                </span>
+              </span>
+
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_1s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.45s]"
+                >
+                  want
+                </span>
+              </span>
+
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_1s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.5s]"
+                >
+                  to
+                </span>
+              </span>
+
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_1s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.55s]"
+                >
+                  forget.
+                </span>
+              </span>
             </h1>
             <!-- Description -->
             <p
@@ -183,17 +271,22 @@
               keep track of everything you want to watch.
             </p>
             <!-- Search -->
-            <div class="relative">
+            <form class="search-form relative">
               <input
                 type="search"
                 placeholder="Search movies..."
-                class="m-auto rounded-full border border-gray-300 px-4 py-2 pr-10 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+                class="search-movies m-auto rounded-full border border-gray-300 px-4 py-2 pr-10 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
               />
               <div class="group">
                 <button
-                  class="btn-theme absolute top-1/2 right-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full hover:bg-gray-200/40 dark:hover:bg-gray-600/40"
+                  type="submit"
+                  class="btn-search absolute top-1/2 right-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full hover:bg-gray-200/40 dark:hover:bg-gray-600/40"
                 >
-                  <img src="./img/search.svg" alt="search" class="h-5 w-5" />
+                  <img
+                    src="./img/icons/search.svg"
+                    alt="search"
+                    class="h-5 w-5"
+                  />
                 </button>
                 <span
                   class="dark:text-light-cream text-dark-black tooltip dark:border-light-cream/20 border-dark-black/20 invisible absolute top-2 left-full ml-2 rounded-full border-1 bg-gray-200/80 px-2 py-1 text-sm font-bold whitespace-nowrap opacity-0 group-hover:visible group-hover:opacity-100 dark:bg-gray-600/80"
@@ -201,9 +294,10 @@
                   Search
                 </span>
               </div>
-            </div>
+            </form>
+
             <!-- Cards Carousel -->
-            <div
+            <!-- <div
               class="section m-0 grid flex-row place-items-center sm:h-[10rem]"
             >
               <div class="flex items-start justify-center [perspective:900px]">
@@ -219,16 +313,61 @@
                   class="hidden h-[clamp(100px,17vw,150px)] w-[120px] [transform-origin:0%_0%] [transform:skewY(-6deg)_rotateY(30deg)] rounded-[20px] bg-blue-500 sm:block lg:h-[200px] lg:w-[160px]"
                 ></div>
               </div>
+            </div> -->
+
+            <div
+              class="search-results-container grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"
+            >
+              <!-- <div
+                class="movie-card relative w-full max-w-[280px] overflow-hidden rounded-xl shadow-[0_8px_20px_rgba(0,0,0,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15)]"
+              >
+                <button
+                  class="add-to-watchlist-btn absolute top-2 right-2 text-xs sm:text-sm"
+                >
+                  Add to Watchlist
+                </button>
+                <div class="relative aspect-[2/3] w-full">
+                  <div class="aspect-[2/3] w-[280px] bg-gray-300"></div>
+
+                  <img alt="mov" src="#" class="h-full w-full object-cover" />
+                </div>
+                <div
+                  class="absolute bottom-0 left-0 h-2/3 w-full bg-gradient-to-t from-black/90 to-transparent"
+                ></div>
+
+                <div
+                  class="movie-details text-light-cream absolute bottom-3 left-2 mx-3"
+                >
+                  <h2 class="movie-title text-lg sm:text-xl">the dark</h2>
+                  <p
+                    class="movie-rating flex items-center gap-1 text-sm sm:text-sm"
+                  >
+                    7.9 *****
+                  </p>
+                  <p class="movie-release-date inline text-sm sm:text-sm">
+                    1405
+                  </p>
+                  <span class="devider text-sm text-white/20">|</span>
+                  <p class="movie-runtime inline text-sm sm:text-sm">1h 34m</p>
+                  <p class="movie-genres text-sm">action</p>
+                </div>
+              </div> -->
             </div>
           </div>
         </main>
+        <div
+          class="toast fixed top-5 right-5 z-50 hidden [animation:border_4s_linear_infinite] rounded-xl border-2 border-transparent px-4 py-3 text-sm text-zinc-900 shadow-lg [background:linear-gradient(white,white)_padding-box,conic-gradient(from_var(--border-angle),transparent_25%,var(--toast-color)_50%,transparent_75%)_border-box] dark:text-white dark:[background:linear-gradient(#18181b,#18181b)_padding-box,conic-gradient(from_var(--border-angle),transparent_25%,var(--toast-color)_50%,transparent_75%)_border-box]"
+        >
+          <span class="toast-message"></span>
+        </div>
         <!-- Bottom Glow -->
         <div
           class="pointer-events-none absolute right-0 bottom-0 h-[700px] w-full bg-[radial-gradient(circle_500px_at_0%_100%,rgba(250,204,21,0.22),transparent)]"
         ></div>
       </div>
     </div>
+
     <!-- script -->
-    <script defer src="./js/controller.js"></script>
+    <script type="module" src="./js/controller.js"></script>
   </body>
 </html>
