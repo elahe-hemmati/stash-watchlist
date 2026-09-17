@@ -135,7 +135,7 @@ btnTheme.addEventListener("click", toggleTheme);
 // const API_KEY = process.env.TMDB_API_KEY;
 const TOKEN = process.env.TMDB_TOKEN;
 const BASE_URL = "https://api.themoviedb.org/3/";
-const searchMoviesInput = document.querySelector(".search-movies");
+const searchMediasInput = document.querySelector(".search-media");
 const searchForm = document.querySelector(".search-form");
 const searchResultsContainer = document.querySelector(
   ".search-results-container",
@@ -177,31 +177,33 @@ const request = async function (endpoint) {
   }
 };
 
-const prepareMovieData = function (movie) {
+const prepareMediaData = function (media) {
   return {
-    id: movie.id,
-    title: movie.title,
-    poster: movie.poster_path,
-    backdrop: movie.backdrop_path,
-    overview: movie.overview,
-    year: movie.release_date,
-    rating: movie.vote_average,
-    genres: movie.genre_ids,
-    runtime: movie.runtime,
+    type: media.media_type,
+    id: media.id,
+    title: media.media_type === "movie" ? media.title : media.name,
+    poster: media.poster_path,
+    backdrop: media.backdrop_path,
+    overview: media.overview,
+    year:
+      media.media_type === "movie" ? media.release_date : media.first_air_date,
+    rating: media.vote_average,
+    genres: media.genre_ids,
+    runtime: media.runtime,
     watched: false,
   };
 };
 
-const getMovieDetails = async function (id) {
-  const data = await request(`/movie/${id}`);
-
-  return data;
+const getMediaDetails = async function (id, type) {
+  return type === "movie"
+    ? await request(`movie/${id}`)
+    : await request(`tv/${id}`);
 };
 
-const getMovieGenres = async function () {
-  const data = await request("/genre/movie/list");
-
-  return data;
+const getMediaGenres = async function (type) {
+  return type === "movie"
+    ? await request("/genre/movie/list")
+    : await request("/genre/tv/list");
 };
 
 const getPosterUrl = function (posterPath) {
@@ -231,42 +233,50 @@ const getRatingStars = function (rating) {
     emptyStars,
   };
 };
-const getSearchMovies = async function (e) {
+
+const getSearchMedias = async function (e) {
   try {
     e.preventDefault();
-    const query = searchMoviesInput.value;
+    const query = searchMediasInput.value;
     if (!query.trim()) {
       searchResultsContainer.innerHTML = "";
-      showToast("Please enter a movie name.");
+      showToast("Please enter a media name.");
       return;
     }
     const encodedQuery = encodeURIComponent(query);
-    const data = await request(`/search/movie?query=${encodedQuery}`);
+    const data = await request(`/search/multi?query=${encodedQuery}`);
     if (data.results.length === 0) {
       searchResultsContainer.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center gap-2 min-h-[200px]">
         <img src="${noResultIcon}" alt="" class="w-10 h-10 block animate-pulse"/>
         <p class="text-center text-sm text-zinc-500 dark:text-zinc-400">
-         No movies found.</p></div>`;
+         No medias found.</p></div>`;
       return;
     }
-    const movies = data.results.map((movie) => prepareMovieData(movie));
-    const movieDetails = await Promise.all(
-      movies.map((movie) => getMovieDetails(movie.id)),
+    const medias = data.results
+      .filter((media) => media.media_type !== "person")
+      .map((media) => prepareMediaData(media));
+    const mediaDetails = await Promise.all(
+      medias.map((media) => getMediaDetails(media.id, media.type)),
     );
+    for (let i = 0; i < mediaDetails.length; i++) {
+      if (medias[i].type === "movie") {
+        medias[i].runtime = mediaDetails[i].runtime;
+      } else {
+        medias[i].seasons = mediaDetails[i].number_of_seasons;
+        medias[i].episodes = mediaDetails[i].number_of_episodes;
+      }
+    }
+    const movieGenres = await getMediaGenres("movie");
+    const tvGenres = await getMediaGenres("tv");
 
-    for (let i = 0; i < movieDetails.length; i++)
-      movies[i].runtime = movieDetails[i].runtime;
+    renderSearchMedia(medias, movieGenres, tvGenres);
 
-    const genres = await getMovieGenres();
-
-    renderSearchMovies(movies, genres);
-
-    return movies;
+    return medias;
   } catch (err) {
-    console.error(err.message);
+    console.error(err);
     searchResultsContainer.innerHTML = "";
     showToast(
-      "Unable to connect to the movie service. Please check your internet connection or VPN.",
+      "Unable to connect to the media service. Please check your internet connection or VPN.",
     );
   }
 };
@@ -278,10 +288,10 @@ const getSearchMovies = async function (e) {
 //                   })
 //                   .join(", ")}
 
-const renderSearchMovies = function (movies, genres) {
+const renderSearchMedia = function (medias, movieGenres, tvGenres) {
   searchResultsContainer.innerHTML = "";
-  movies.map((movie) => {
-    const { fullStars, halfStar, emptyStars } = getRatingStars(movie.rating);
+  medias.map((media) => {
+    const { fullStars, halfStar, emptyStars } = getRatingStars(media.rating);
     let starsHTML = "";
 
     for (let i = 0; i < fullStars; i++) {
@@ -293,45 +303,52 @@ const renderSearchMovies = function (movies, genres) {
     for (let i = 0; i < emptyStars; i++) {
       starsHTML += `<img src="${starEmpty}" class="inline-block w-4 h-4">`;
     }
+    const genres = media.type === "movie" ? movieGenres : tvGenres;
     const genre = genres.genres.find(
-      (genre) => genre.id === movie.genres?.at(0),
+      (genre) => genre.id === media.genres?.at(0),
     );
     const runtime =
-      movie.runtime != null
-        ? `${Math.floor(movie.runtime / 60)}h ${movie.runtime - Math.floor(movie.runtime / 60) * 60}m`
-        : "N/A";
+      media.type === "movie"
+        ? media.runtime != null
+          ? `${Math.floor(media.runtime / 60)}h ${
+              media.runtime - Math.floor(media.runtime / 60) * 60
+            }m`
+          : "N/A"
+        : `${media.seasons} S · ${media.episodes} EP`;
+    const mediaTypeBadge =
+      media.type === "movie" ? "bg-amber-300/80" : "bg-orange-500/80";
     const card = `
-            <div class="movie-card relative w-full max-w-[280px] overflow-hidden rounded-xl shadow-[0_8px_20px_rgba(0,0,0,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15)]">
-
-              <button class="add-to-watchlist-btn absolute top-2 right-2 text-xs sm:text-sm">
-                Add to Watchlist</button>
+            <div class="media-card relative w-full max-w-[280px] overflow-hidden rounded-xl shadow-[0_8px_20px_rgba(0,0,0,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15)]">
+              <span class="absolute top-2 left-2 z-10 rounded-md px-2 py-1 text-[10px] font-semibold tracking-wide text-white ${mediaTypeBadge}">
+              ${media.type === "movie" ? "MOVIE" : "TV SHOW"}</span>
+              <button class="add-to-watchlist-btn absolute top-2 right-2 text-xs sm:text-sm">Add to Watchlist</button>
                <div class="poster-wrapper relative aspect-[2/3] w-full bg-[radial-gradient(circle_at_center,rgba(234,179,8,0.18),transparent_55%),linear-gradient(145deg,#18181b,#09090b)] animate-pulse">
                 <div class="poster-error hidden absolute inset-0 flex items-center justify-center">
                   <img src="${imageError}" class="w-6 h-6">
                 </div>
                 <img
-                alt="${movie.title}"
-                src="${getPosterUrl(movie.poster)}"
+                alt="${media.title}"
+                src="${getPosterUrl(media.poster)}"
                 loading="lazy"
                 decoding="async"
-                class="movie-poster w-full h-full object-cover opacity-0 transition-opacity duration-300"
+                class="media-poster w-full h-full object-cover opacity-0 transition-opacity duration-300"
                 />
               </div>
-              <div class="absolute bottom-0 left-0 h-2/3 w-full bg-gradient-to-t from-black/90 to-transparent"></div>
+              <div class="absolute bottom-0 left-0 h-3/4 w-full bg-gradient-to-t from-black to-transparent"></div>
 
-              <div class="movie-details text-light-cream absolute bottom-3 left-2 mx-3">
-                  <h2 class="movie-title text-lg sm:text-xl">${movie.title}</h2>
-                  <p class="movie-rating flex gap-1 items-center text-sm sm:text-sm">${movie.rating?.toFixed(1) ?? "N/A"}${starsHTML}</p>
-                  <p class="movie-release-date inline text-sm sm:text-sm">${movie.year?.slice(0, 4) ?? "N/A"}</p>
+              <div class="media-details text-light-cream absolute bottom-3 left-2 mx-3">
+                  <h2 class="media-title line-clamp-1 text-lg sm:line-clamp-2 sm:text-xl">${media.title}</h2>
+                  <p class="media-rating flex gap-1 items-center text-sm sm:text-sm">${media.rating?.toFixed(1) ?? "N/A"}${starsHTML}</p>
+                  <p class="media-release-date inline text-sm sm:text-sm">${media.year?.slice(0, 4) ?? "N/A"}</p>
                   <span class="devider text-white/20 text-sm">|</span>
-                  <p class="movie-runtime inline text-sm sm:text-sm">${runtime}</p>
-                  <p class="movie-genres text-sm">${genre ? genre.name : "N/A"}</p>
+                  <p class="media-runtime inline text-sm sm:text-sm">${runtime}</p>
+                  <p class="media-genres text-sm">${genre ? genre.name : "N/A"}</p>
               </div>
             </div>`;
-    searchResultsContainer.insertAdjacentHTML("afterbegin", card);
+    searchResultsContainer.insertAdjacentHTML("beforeend", card);
   });
-  const moviePosters = document.querySelectorAll(".movie-poster");
-  moviePosters.forEach((poster) => {
+  const mediaPosters = document.querySelectorAll(".media-poster");
+  mediaPosters.forEach((poster) => {
     (poster.addEventListener("load", () => {
       poster.classList.remove("opacity-0");
       poster.parentNode.classList.remove("animate-pulse");
@@ -344,4 +361,4 @@ const renderSearchMovies = function (movies, genres) {
   });
 };
 // enent
-searchForm.addEventListener("submit", getSearchMovies);
+searchForm.addEventListener("submit", getSearchMedias);
