@@ -132,14 +132,20 @@ btnAsideToggle.addEventListener("click", asideToggle);
 btnTheme.addEventListener("click", toggleTheme);
 
 // ********API
+
 // const API_KEY = process.env.TMDB_API_KEY;
 const TOKEN = process.env.TMDB_TOKEN;
 const BASE_URL = "https://api.themoviedb.org/3/";
 const searchMediasInput = document.querySelector(".search-media");
+const clearSearchButton = document.querySelector(".btn-clear");
 const searchForm = document.querySelector(".search-form");
 const searchResultsContainer = document.querySelector(
   ".search-results-container",
 );
+const mediaFilters = document.querySelector(".media-filters");
+const pill = document.querySelector(".pill");
+let activeFilter = document.querySelector(".media-filter");
+let movieType, tvType, medias, movieGenres, tvGenres;
 const options = {
   method: "GET",
   headers: {
@@ -237,27 +243,38 @@ const getRatingStars = function (rating) {
 const getSearchMedias = async function (e) {
   try {
     e.preventDefault();
+    activeFilter = document.querySelector(".media-filter");
+
+    pill.style.transform = `translateX(${activeFilter.offsetLeft}px)`;
+    pill.style.width = `${activeFilter.offsetWidth}px`;
     const query = searchMediasInput.value;
+
     if (!query.trim()) {
+      mediaFilters.classList.add("invisible");
       searchResultsContainer.innerHTML = "";
       showToast("Please enter a media name.");
       return;
     }
     const encodedQuery = encodeURIComponent(query);
+
     const data = await request(`/search/multi?query=${encodedQuery}`);
+
     if (data.results.length === 0) {
+      mediaFilters.classList.add("invisible");
       searchResultsContainer.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center gap-2 min-h-[200px]">
         <img src="${noResultIcon}" alt="" class="w-10 h-10 block animate-pulse"/>
         <p class="text-center text-sm text-zinc-500 dark:text-zinc-400">
          No medias found.</p></div>`;
       return;
     }
-    const medias = data.results
+
+    medias = data.results
       .filter((media) => media.media_type !== "person")
       .map((media) => prepareMediaData(media));
     const mediaDetails = await Promise.all(
       medias.map((media) => getMediaDetails(media.id, media.type)),
     );
+
     for (let i = 0; i < mediaDetails.length; i++) {
       if (medias[i].type === "movie") {
         medias[i].runtime = mediaDetails[i].runtime;
@@ -266,8 +283,11 @@ const getSearchMedias = async function (e) {
         medias[i].episodes = mediaDetails[i].number_of_episodes;
       }
     }
-    const movieGenres = await getMediaGenres("movie");
-    const tvGenres = await getMediaGenres("tv");
+
+    movieGenres = await getMediaGenres("movie");
+    tvGenres = await getMediaGenres("tv");
+    movieType = medias.filter((movie) => movie.type === "movie");
+    tvType = medias.filter((movie) => movie.type === "tv");
 
     renderSearchMedia(medias, movieGenres, tvGenres);
 
@@ -281,6 +301,31 @@ const getSearchMedias = async function (e) {
   }
 };
 
+const filterMediaButtonGroup = function (e) {
+  const button = e.target.closest(".media-filter");
+  if (!button) return;
+  pill.style.transform = `translateX(${button.offsetLeft}px)`;
+  pill.style.width = `${button.offsetWidth}px`;
+};
+
+const filterMedia = function (e) {
+  e.preventDefault();
+  const filter = e.target.closest(".media-filter");
+  if (!filter) return;
+  activeFilter = filter;
+  const type = e.target.dataset.type;
+  if (type === "movie") {
+    renderSearchMedia(movieType, movieGenres, tvGenres);
+  } else if (type === "tv") {
+    renderSearchMedia(tvType, movieGenres, tvGenres);
+  } else {
+    renderSearchMedia(medias, movieGenres, tvGenres);
+  }
+};
+const filterMediaButtonGroupLeave = function () {
+  pill.style.transform = `translateX(${activeFilter.offsetLeft}px)`;
+  pill.style.width = `${activeFilter.offsetWidth}px`;
+};
 // ${movie.genres
 //                   .map((genreID) => {
 //                     return genres.genres.find((genre) => genre.id === genreID)
@@ -346,6 +391,7 @@ const renderSearchMedia = function (medias, movieGenres, tvGenres) {
               </div>
             </div>`;
     searchResultsContainer.insertAdjacentHTML("beforeend", card);
+    document.querySelector(".media-filters").classList.remove("invisible");
   });
   const mediaPosters = document.querySelectorAll(".media-poster");
   mediaPosters.forEach((poster) => {
@@ -362,3 +408,16 @@ const renderSearchMedia = function (medias, movieGenres, tvGenres) {
 };
 // enent
 searchForm.addEventListener("submit", getSearchMedias);
+mediaFilters.addEventListener("click", filterMedia);
+mediaFilters.addEventListener("mouseover", filterMediaButtonGroup);
+mediaFilters.addEventListener("mouseleave", filterMediaButtonGroupLeave);
+searchMediasInput.addEventListener("input", function () {
+  clearSearchButton.classList.toggle("hidden", !searchMediasInput.value);
+  clearSearchButton.classList.toggle("flex", !!searchMediasInput.value);
+});
+clearSearchButton.addEventListener("click", function () {
+  searchMediasInput.value = "";
+  clearSearchButton.classList.add("hidden");
+  clearSearchButton.classList.remove("flex");
+  searchMediasInput.focus();
+});

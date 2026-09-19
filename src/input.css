@@ -96,6 +96,11 @@
     transform: rotate(360deg);
   }
 }
+/* search clear input */
+.search-media::-webkit-search-cancel-button {
+  appearance: none;
+}
+
 /* toast */
 @property --border-angle {
   syntax: "<angle>";
