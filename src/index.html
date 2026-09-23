@@ -26,7 +26,7 @@
       ></div>
       <!-- Top Glow -->
       <div
-        class="pointer-events-none absolute top-0 right-0 h-[100vh] w-full bg-[radial-gradient(circle_500px_at_100%_200px,rgba(250,204,21,0.32),transparent)]"
+        class="pointer-events-none absolute top-0 right-0 h-[100vh] w-full bg-[radial-gradient(circle_250px_at_100%_200px,rgba(250,204,21,0.32),transparent)] lg:bg-[radial-gradient(circle_500px_at_100%_200px,rgba(250,204,21,0.32),transparent)]"
       ></div>
 
       <!-- ***--***LAYOUT***--*** -->
@@ -90,7 +90,7 @@
               />
 
               <p class="aside-text transition-opacity duration-300 lg:hidden">
-                Open Sidebar
+                Close Sidebar
               </p>
             </button>
 
@@ -301,7 +301,7 @@
                 </button>
 
                 <span
-                  class="tooltip invisible absolute top-1 left-full ml-2 rounded-full border border-zinc-200/70 bg-zinc-100/80 px-2 py-1 text-sm font-bold whitespace-nowrap text-zinc-800 opacity-0 backdrop-blur-md transition-opacity duration-200 group-hover:visible group-hover:opacity-100 dark:border-white/10 dark:bg-zinc-800/80 dark:text-white"
+                  class="tooltip invisible absolute right-0 bottom-full mb-2 rounded-full border border-zinc-200/70 bg-zinc-100/80 px-2 py-1 text-sm font-bold whitespace-nowrap text-zinc-800 opacity-0 backdrop-blur-md transition-opacity duration-200 group-hover:visible group-hover:opacity-100 lg:top-1 lg:right-auto lg:bottom-auto lg:left-full lg:ml-2 dark:border-white/10 dark:bg-zinc-800/80 dark:text-white"
                 >
                   Search
                 </span>
@@ -358,6 +358,9 @@
             <div
               class="search-results-container grid grid-cols-1 gap-4 p-3 min-[411px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
             ></div>
+            <!-- Sentinel -->
+            <div class="pagination-loader hidden min-h-[200px]"></div>
+            <div class="sentinel h-1"></div>
           </div>
         </main>
         <!-- Toast -->

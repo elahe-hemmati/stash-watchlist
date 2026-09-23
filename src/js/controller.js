@@ -25,7 +25,6 @@ const lightTheme = document.querySelector(".light-theme");
 const darkTheme = document.querySelector(".dark-theme");
 const tooltip = document.querySelectorAll(".tooltip");
 const asideText = document.querySelectorAll(".aside-text");
-// const main = document.querySelector(".main");
 
 // ************************************************
 // DOM
@@ -38,7 +37,9 @@ const asideOpenMobile = function (e) {
   aside.classList.add("translate-x-0");
   aside.classList.remove("-translate-x-full");
   overlay.classList.remove("hidden");
-  asideText.classList.remove("lg:hidden");
+  asideText.forEach((text) => {
+    text.classList.remove("lg:hidden");
+  });
 };
 const asideCloseMobile = function (e) {
   e.preventDefault();
@@ -47,7 +48,9 @@ const asideCloseMobile = function (e) {
   aside.classList.remove("translate-x-0");
   aside.classList.add("-translate-x-full");
   overlay.classList.add("hidden");
-  asideText.classList.add("lg:hidden");
+  asideText.forEach((text) => {
+    text.classList.add("lg:hidden");
+  });
 };
 // expand sidebar
 const asideToggle = function () {
@@ -145,7 +148,12 @@ const searchResultsContainer = document.querySelector(
 const mediaFilters = document.querySelector(".media-filters");
 const pill = document.querySelector(".pill");
 let activeFilter = document.querySelector(".media-filter");
-let movieType, tvType, medias, movieGenres, tvGenres;
+let medias, movieGenres, tvGenres;
+let currentPage = 1;
+let totalPages = 1;
+let isLoading = false;
+let currentQuery = "";
+const sentinel = document.querySelector(".sentinel");
 const options = {
   method: "GET",
   headers: {
@@ -167,10 +175,8 @@ const renderSpinner = function (parentEl) {
 
 const request = async function (endpoint) {
   try {
-    renderSpinner(searchResultsContainer);
     const res = await fetch(`${BASE_URL}${endpoint}`, options);
     const data = await res.json();
-
     if (!res.ok)
       throw new Error(
         `${data.status_message} Error, http status code ${res.status}`,
@@ -208,12 +214,14 @@ const getMediaDetails = async function (id, type) {
 
 const getMediaGenres = async function (type) {
   return type === "movie"
-    ? await request("/genre/movie/list")
-    : await request("/genre/tv/list");
+    ? await request("genre/movie/list")
+    : await request("genre/tv/list");
 };
 
-const getPosterUrl = function (posterPath) {
-  return `https://image.tmdb.org/t/p/w500${posterPath}`;
+const getPosterUrl = (posterPath) => {
+  return posterPath
+    ? `https://image.tmdb.org/t/p/w500${posterPath}`
+    : imageError;
 };
 const getBackdropUrl = function (backdropPath) {
   return backdropPath
@@ -239,16 +247,80 @@ const getRatingStars = function (rating) {
     emptyStars,
   };
 };
+const prepareSearchResults = async function (data) {
+  const pageMedias = data.results
+    .filter((media) => media.media_type !== "person")
+    .map((media) => prepareMediaData(media));
+
+  const mediaDetails = await Promise.all(
+    pageMedias.map((media) => getMediaDetails(media.id, media.type)),
+  );
+
+  for (let i = 0; i < mediaDetails.length; i++) {
+    if (pageMedias[i].type === "movie") {
+      pageMedias[i].runtime = mediaDetails[i].runtime;
+    } else {
+      pageMedias[i].seasons = mediaDetails[i].number_of_seasons;
+      pageMedias[i].episodes = mediaDetails[i].number_of_episodes;
+    }
+  }
+
+  return pageMedias;
+};
+const loadNextPage = async function () {
+  const nextPage = currentPage + 1;
+  const queryAtStart = currentQuery;
+  const loader = document.querySelector(".pagination-loader");
+  loader.innerHTML = `
+  <div class="flex items-center justify-center gap-2 py-6">
+  <span class="loader"></span>
+  <span>Loading more...</span>
+  </div>
+  `;
+  loader.classList.remove("hidden");
+
+  try {
+    const data = await request(
+      `search/multi?query=${encodeURIComponent(currentQuery)}&page=${nextPage}`,
+    );
+    const newMedias = await prepareSearchResults(data);
+    if (queryAtStart !== currentQuery) return;
+    currentPage = nextPage;
+    const type = activeFilter.dataset.type;
+    let filteredMedia = newMedias;
+    if (type === "movie") {
+      filteredMedia = newMedias.filter((media) => media.type === "movie");
+    }
+    if (type === "tv") {
+      filteredMedia = newMedias.filter((media) => media.type === "tv");
+    }
+    medias = medias.concat(newMedias);
+    renderSearchMedia(filteredMedia, movieGenres, tvGenres, false);
+    observer.unobserve(sentinel);
+    observer.observe(sentinel);
+  } catch (err) {
+    console.error(err);
+    showToast("Could not load more results.");
+  } finally {
+    loader.classList.add("hidden");
+    isLoading = false;
+  }
+};
 
 const getSearchMedias = async function (e) {
   try {
     e.preventDefault();
+    isLoading = false;
+    medias = [];
+    currentPage = 1;
+    totalPages = 1;
     activeFilter = document.querySelector(".media-filter");
 
     pill.style.transform = `translateX(${activeFilter.offsetLeft}px)`;
     pill.style.width = `${activeFilter.offsetWidth}px`;
-    const query = searchMediasInput.value;
 
+    const query = searchMediasInput.value;
+    currentQuery = query;
     if (!query.trim()) {
       mediaFilters.classList.add("invisible");
       searchResultsContainer.innerHTML = "";
@@ -256,8 +328,11 @@ const getSearchMedias = async function (e) {
       return;
     }
     const encodedQuery = encodeURIComponent(query);
-
-    const data = await request(`/search/multi?query=${encodedQuery}`);
+    renderSpinner(searchResultsContainer);
+    const data = await request(
+      `search/multi?query=${encodedQuery}&page=${currentPage}`,
+    );
+    totalPages = data.total_pages;
 
     if (data.results.length === 0) {
       mediaFilters.classList.add("invisible");
@@ -268,26 +343,9 @@ const getSearchMedias = async function (e) {
       return;
     }
 
-    medias = data.results
-      .filter((media) => media.media_type !== "person")
-      .map((media) => prepareMediaData(media));
-    const mediaDetails = await Promise.all(
-      medias.map((media) => getMediaDetails(media.id, media.type)),
-    );
-
-    for (let i = 0; i < mediaDetails.length; i++) {
-      if (medias[i].type === "movie") {
-        medias[i].runtime = mediaDetails[i].runtime;
-      } else {
-        medias[i].seasons = mediaDetails[i].number_of_seasons;
-        medias[i].episodes = mediaDetails[i].number_of_episodes;
-      }
-    }
-
+    medias = await prepareSearchResults(data);
     movieGenres = await getMediaGenres("movie");
     tvGenres = await getMediaGenres("tv");
-    movieType = medias.filter((movie) => movie.type === "movie");
-    tvType = medias.filter((movie) => movie.type === "tv");
 
     renderSearchMedia(medias, movieGenres, tvGenres);
 
@@ -313,19 +371,25 @@ const filterMedia = function (e) {
   const filter = e.target.closest(".media-filter");
   if (!filter) return;
   activeFilter = filter;
-  const type = e.target.dataset.type;
+  const type = filter.dataset.type;
   if (type === "movie") {
-    renderSearchMedia(movieType, movieGenres, tvGenres);
+    const movieMedias = medias.filter((media) => media.type === "movie");
+    renderSearchMedia(movieMedias, movieGenres, tvGenres);
   } else if (type === "tv") {
-    renderSearchMedia(tvType, movieGenres, tvGenres);
+    const tvMedias = medias.filter((media) => media.type === "tv");
+    renderSearchMedia(tvMedias, movieGenres, tvGenres);
   } else {
     renderSearchMedia(medias, movieGenres, tvGenres);
   }
+  observer.unobserve(sentinel);
+  observer.observe(sentinel);
 };
+
 const filterMediaButtonGroupLeave = function () {
   pill.style.transform = `translateX(${activeFilter.offsetLeft}px)`;
   pill.style.width = `${activeFilter.offsetWidth}px`;
 };
+
 // ${movie.genres
 //                   .map((genreID) => {
 //                     return genres.genres.find((genre) => genre.id === genreID)
@@ -333,9 +397,27 @@ const filterMediaButtonGroupLeave = function () {
 //                   })
 //                   .join(", ")}
 
-const renderSearchMedia = function (medias, movieGenres, tvGenres) {
-  searchResultsContainer.innerHTML = "";
-  medias.map((media) => {
+const escapeHTML = (str) => {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
+const renderSearchMedia = function (
+  medias,
+  movieGenres,
+  tvGenres,
+  clearContainer = true,
+) {
+  console.trace("RENDER CALLED");
+  if (clearContainer) {
+    searchResultsContainer.innerHTML = "";
+  }
+  const previousCount = searchResultsContainer.children.length;
+  medias.forEach((media) => {
     const { fullStars, halfStar, emptyStars } = getRatingStars(media.rating);
     let starsHTML = "";
 
@@ -362,55 +444,87 @@ const renderSearchMedia = function (medias, movieGenres, tvGenres) {
         : `${media.seasons} S · ${media.episodes} EP`;
     const mediaTypeBadge =
       media.type === "movie" ? "bg-amber-300/80" : "bg-orange-500/80";
+    const hasPoster = Boolean(media.poster);
     const card = `
             <div class="media-card relative w-full max-w-[280px] overflow-hidden rounded-xl shadow-[0_8px_20px_rgba(0,0,0,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15)]">
               <span class="absolute top-2 left-2 z-10 rounded-md px-2 py-1 text-[10px] font-semibold tracking-wide text-white ${mediaTypeBadge}">
               ${media.type === "movie" ? "MOVIE" : "TV SHOW"}</span>
               <button class="add-to-watchlist-btn absolute top-2 right-2 text-xs sm:text-sm">Add to Watchlist</button>
-               <div class="poster-wrapper relative aspect-[2/3] w-full bg-[radial-gradient(circle_at_center,rgba(234,179,8,0.18),transparent_55%),linear-gradient(145deg,#18181b,#09090b)] animate-pulse">
-                <div class="poster-error hidden absolute inset-0 flex items-center justify-center">
+               <div class="poster-wrapper relative aspect-[2/3] w-full bg-[radial-gradient(circle_at_center,rgba(234,179,8,0.18),transparent_55%),linear-gradient(145deg,#18181b,#09090b)] ${hasPoster ? "animate-pulse" : ""}">
+                <div class="poster-error ${hasPoster ? "hidden" : ""} absolute inset-0 flex items-center justify-center">
                   <img src="${imageError}" class="w-6 h-6">
-                </div>
-                <img
-                alt="${media.title}"
-                src="${getPosterUrl(media.poster)}"
-                loading="lazy"
-                decoding="async"
-                class="media-poster w-full h-full object-cover opacity-0 transition-opacity duration-300"
-                />
-              </div>
+                </div>${
+                  hasPoster
+                    ? `<img
+                      alt="${escapeHTML(media.title)}"
+                      src="${getPosterUrl(media.poster)}"
+                      loading="lazy"
+                      decoding="async"
+                      class="media-poster w-full h-full object-cover opacity-0 transition-opacity duration-300"/>`
+                    : ""
+                }</div>
               <div class="absolute bottom-0 left-0 h-3/4 w-full bg-gradient-to-t from-black to-transparent"></div>
 
               <div class="media-details text-light-cream absolute bottom-3 left-2 mx-3">
-                  <h2 class="media-title line-clamp-1 text-lg sm:line-clamp-2 sm:text-xl">${media.title}</h2>
+                  <h2 class="media-title line-clamp-1 text-lg sm:line-clamp-2 sm:text-xl">${escapeHTML(media.title)}</h2>
                   <p class="media-rating flex gap-1 items-center text-sm sm:text-sm">${media.rating?.toFixed(1) ?? "N/A"}${starsHTML}</p>
                   <p class="media-release-date inline text-sm sm:text-sm">${media.year?.slice(0, 4) ?? "N/A"}</p>
                   <span class="devider text-white/20 text-sm">|</span>
                   <p class="media-runtime inline text-sm sm:text-sm">${runtime}</p>
-                  <p class="media-genres text-sm">${genre ? genre.name : "N/A"}</p>
+                  <p class="media-genres text-sm">${genre ? escapeHTML(genre.name) : "N/A"}</p>
               </div>
             </div>`;
     searchResultsContainer.insertAdjacentHTML("beforeend", card);
-    document.querySelector(".media-filters").classList.remove("invisible");
   });
-  const mediaPosters = document.querySelectorAll(".media-poster");
-  mediaPosters.forEach((poster) => {
-    (poster.addEventListener("load", () => {
+
+  document.querySelector(".media-filters").classList.remove("invisible");
+
+  const newMediaCards = Array.from(searchResultsContainer.children).slice(
+    previousCount,
+  );
+
+  newMediaCards.forEach((card) => {
+    const poster = card.querySelector(".media-poster");
+    if (!poster) return;
+    poster.addEventListener("load", () => {
       poster.classList.remove("opacity-0");
       poster.parentNode.classList.remove("animate-pulse");
-    }),
-      poster.addEventListener("error", () => {
-        const posterError = poster.parentNode.querySelector(".poster-error");
-        posterError.classList.remove("hidden");
-        poster.parentElement.classList.remove("animate-pulse");
-      }));
+    });
+    poster.addEventListener("error", () => {
+      const posterError = poster.parentNode.querySelector(".poster-error");
+      posterError.classList.remove("hidden");
+      poster.parentElement.classList.remove("animate-pulse");
+    });
   });
 };
+
+const observeCallback = function (entries, observer) {
+  entries.forEach((entry) => {
+    if (
+      entry.isIntersecting &&
+      isLoading === false &&
+      currentQuery.trim() !== "" &&
+      currentPage < totalPages
+    ) {
+      isLoading = true;
+      loadNextPage();
+    }
+  });
+};
+const observeOptions = {
+  root: null,
+  rootMargin: "200px",
+  threshold: 0.1,
+};
+const observer = new IntersectionObserver(observeCallback, observeOptions);
+observer.observe(sentinel);
+
 // enent
 searchForm.addEventListener("submit", getSearchMedias);
 mediaFilters.addEventListener("click", filterMedia);
 mediaFilters.addEventListener("mouseover", filterMediaButtonGroup);
 mediaFilters.addEventListener("mouseleave", filterMediaButtonGroupLeave);
+// clear input
 searchMediasInput.addEventListener("input", function () {
   clearSearchButton.classList.toggle("hidden", !searchMediasInput.value);
   clearSearchButton.classList.toggle("flex", !!searchMediasInput.value);
