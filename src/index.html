@@ -1,8 +1,9 @@
 <!doctype html>
-<html class="dark">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stash</title>
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="./img/favicon/favicon.ico" />
     <link href="./input.css" rel="stylesheet" />
@@ -276,6 +277,8 @@
                 type="search"
                 placeholder="Search media..."
                 class="search-media m-auto w-full rounded-xl border border-zinc-200/70 bg-zinc-100/70 px-4 py-2 pr-11 text-sm text-zinc-800 backdrop-blur-md transition-all duration-300 ease-out outline-none placeholder:text-zinc-400 focus:border-amber-500/60 focus:bg-zinc-100/80 focus:ring-2 focus:ring-amber-500/15 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-500 dark:focus:bg-white/10"
+                name="search"
+                autocomplete="off"
               />
 
               <button
@@ -377,6 +380,6 @@
     </div>
 
     <!-- script -->
-    <script type="module" src="./js/controller.js"></script>
+    <script type="module" src="./js/controllers/controller.js"></script>
   </body>
 </html>
