@@ -1,12 +1,15 @@
 class SidebarView {
   _aside = document.querySelector(".aside");
-  _overlay = document.querySelector(".overlay");
   _asideIconShow = document.querySelector(".aside-icon--show");
   _asideIconHide = document.querySelector(".aside-icon--hide");
   _stashLogoS = document.querySelector(".stash-logo-s");
   _stashLogoFull = document.querySelector(".stash-logo-full");
-  _tooltip = document.querySelectorAll(".tooltip");
+  _tooltip = document.querySelectorAll(".aside .tooltip");
   _asideText = document.querySelectorAll(".aside-text");
+  _btnNavOpen = document.querySelector(".btn-nav--open");
+  _btnNavClose = document.querySelector(".btn-nav--close");
+  _overlay = document.querySelector(".overlay");
+  _btnAsideToggle = document.querySelector(".btn-aside--toggle");
 
   _setMobileState(isOpen) {
     this._stashLogoS.classList.toggle("hidden", isOpen);
@@ -65,6 +68,18 @@ class SidebarView {
         });
       }, 300);
     }
+  }
+  addHandlerNavOpen(handler) {
+    this._btnNavOpen.addEventListener("click", handler);
+  }
+  addHandlerNavClose(handler) {
+    this._btnNavClose.addEventListener("click", handler);
+  }
+  addHandlerOverlay(handler) {
+    this._overlay.addEventListener("click", handler);
+  }
+  addHandlerAsideToggle(handler) {
+    this._btnAsideToggle.addEventListener("click", handler);
   }
 }
 export default new SidebarView();

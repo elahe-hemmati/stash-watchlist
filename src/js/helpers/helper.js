@@ -37,6 +37,23 @@ export const escapeHTML = (str) => {
     .replace(/'/g, "&#039;");
 };
 
+export const createStarsMarkup = function (fullStars, halfStar, emptyStars) {
+  let starsHTML = "";
+  for (let i = 0; i < fullStars; i++) {
+    starsHTML += `<img src="${assets.starFilled}" class="inline-block w-4 h-4">`;
+  }
+
+  for (let i = 0; i < halfStar; i++) {
+    starsHTML += `<img src="${assets.starHalfEmpty}" class="inline-block w-4 h-4">`;
+  }
+
+  for (let i = 0; i < emptyStars; i++) {
+    starsHTML += `<img src="${assets.starEmpty}" class="inline-block w-4 h-4">`;
+  }
+
+  return starsHTML;
+};
+
 export const getPosterUrl = (posterPath) => {
   return posterPath
     ? `https://image.tmdb.org/t/p/w500${posterPath}`

@@ -8,9 +8,12 @@ const options = {
   },
 };
 
-export const request = async function (endpoint) {
+export const request = async function (endpoint, signal) {
   try {
-    const res = await fetch(`${BASE_URL}${endpoint}`, options);
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      ...options,
+      signal,
+    });
     const data = await res.json();
     if (!res.ok)
       throw new Error(
@@ -19,7 +22,6 @@ export const request = async function (endpoint) {
 
     return data;
   } catch (err) {
-    console.error(err);
     throw err;
   }
 };
@@ -41,45 +43,55 @@ export const prepareMediaData = function (media) {
   };
 };
 
-export const getMediaDetails = async function (id, type) {
+export const getMediaDetails = async function (id, type, signal) {
   return type === "movie"
-    ? await request(`movie/${id}`)
-    : await request(`tv/${id}`);
+    ? await request(`movie/${id}`, signal)
+    : await request(`tv/${id}`, signal);
 };
 
-export const getMediaGenres = async function (type) {
+export const getMediaGenres = async function (type, signal) {
   return type === "movie"
-    ? await request("genre/movie/list")
-    : await request("genre/tv/list");
+    ? await request("genre/movie/list", signal)
+    : await request("genre/tv/list", signal);
 };
 
 const preparePageMedias = function (data) {
   return data.results
-    .filter((media) => media.media_type !== "person")
+    .filter(
+      (media) => media.media_type === "movie" || media.media_type === "tv",
+    )
     .map((media) => prepareMediaData(media));
 };
 
-const enrichMediaDetails = async function (medias) {
+const enrichMediaDetails = async function (medias, signal) {
   const mediaDetails = await Promise.all(
-    medias.map((media) => getMediaDetails(media.id, media.type)),
+    medias.map(async (media) => {
+      try {
+        return await getMediaDetails(media.id, media.type, signal);
+      } catch (err) {
+        if (err.name === "AbortError") throw err;
+        return null;
+      }
+    }),
   );
-
+  const validMedias = [];
   for (let i = 0; i < mediaDetails.length; i++) {
+    if (!mediaDetails[i]) continue;
     if (medias[i].type === "movie") {
       medias[i].runtime = mediaDetails[i].runtime;
     } else {
       medias[i].seasons = mediaDetails[i].number_of_seasons;
       medias[i].episodes = mediaDetails[i].number_of_episodes;
     }
+    validMedias.push(medias[i]);
   }
 
-  return medias;
+  return validMedias;
 };
 
-export const prepareSearchResults = async function (data) {
+export const prepareSearchResults = async function (data, signal) {
   const pageMedias = preparePageMedias(data);
-
-  return await enrichMediaDetails(pageMedias);
+  return await enrichMediaDetails(pageMedias, signal);
 };
 
 export const filterMediasByType = function (medias, type) {

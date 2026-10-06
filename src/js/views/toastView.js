@@ -1,6 +1,7 @@
 class ToastView {
   _toast = document.querySelector(".toast");
   _toastMessage = document.querySelector(".toast-message");
+  _timeoutId;
 
   showToast(message, type = "error") {
     this._toastMessage.textContent = message;
@@ -12,7 +13,8 @@ class ToastView {
     };
     const color = toastColors[type] ?? toastColors.error;
     this._toast.style.setProperty("--toast-color", color);
-    setTimeout(() => {
+    clearTimeout(this._timeoutId);
+    this._timeoutId = setTimeout(() => {
       this._toast.classList.add("hidden");
     }, 4000);
   }

@@ -1,5 +1,3 @@
-"use strict";
-
 import * as model from "../models/mediaModel.js";
 import mediaView from "../views/mediaView.js";
 import sidebarView from "../views/sidebarView.js";
@@ -9,175 +7,185 @@ import { state } from "../state.js";
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 
-const btnNavOpen = document.querySelector(".btn-nav--open");
-const btnNavClose = document.querySelector(".btn-nav--close");
-const btnAsideToggle = document.querySelector(".btn-aside--toggle");
-const btnTheme = document.querySelector(".btn-theme");
-const overlay = document.querySelector(".overlay");
-const searchForm = document.querySelector(".search-form");
-const mediaFilters = document.querySelector(".media-filters");
-const sentinel = document.querySelector(".sentinel");
-
-let activeFilter = document.querySelector(".media-filter");
-state.activeFilterType = activeFilter.dataset.type;
+let searchController, paginationController;
 
 const loadNextPage = async function () {
   const nextPage = state.currentPage + 1;
   const queryAtStart = state.currentQuery;
   mediaView.renderPaginationLoader();
+  paginationController = new AbortController();
+  const { signal } = paginationController;
   try {
     const data = await model.request(
       `search/multi?query=${encodeURIComponent(state.currentQuery)}&page=${nextPage}`,
+      signal,
     );
-    const newMedias = await model.prepareSearchResults(data);
+    const newMedias = await model.prepareSearchResults(data, signal);
     if (queryAtStart !== state.currentQuery) return;
     state.currentPage = nextPage;
     const type = state.activeFilterType;
     const filteredMedia = model.filterMediasByType(newMedias, type);
     state.medias = state.medias.concat(newMedias);
-    mediaView.renderSearchMedia(
-      filteredMedia,
-      state.movieGenres,
-      state.tvGenres,
-      false,
-    );
-    observer.unobserve(sentinel);
-    observer.observe(sentinel);
+    const hasAnyMatch = model.filterMediasByType(state.medias, type).length > 0;
+
+    if (!hasAnyMatch && nextPage === state.totalPages) {
+      mediaView.renderNoFilterResults(type);
+      return;
+    }
+    mediaView.appendMediaResults({
+      medias: filteredMedia,
+      movieGenres: state.movieGenres,
+      tvGenres: state.tvGenres,
+    });
+    mediaView.resetLoadMoreObserver();
   } catch (err) {
+    if (err.name === "AbortError") return;
     console.error(err);
     toastView.showToast("Could not load more results.");
   } finally {
-    mediaView.hidePaginationLoader();
-    state.isLoading = false;
+    if (!signal.aborted) {
+      if (queryAtStart === state.currentQuery) {
+        mediaView.hidePaginationLoader();
+        state.isLoading = false;
+      }
+    }
   }
 };
 
-const getSearchMedias = async function (e) {
+const getSearchMedias = async function () {
+  let queryAtStart = state.currentQuery;
   try {
-    e.preventDefault();
+    paginationController?.abort();
+    searchController?.abort();
+    mediaView.hidePaginationLoader();
+    searchController = new AbortController();
+    const { signal } = searchController;
     state.isLoading = false;
     state.medias = [];
     state.currentPage = 1;
     state.totalPages = 1;
-    mediaView.moveFilterPill(activeFilter);
+    state.activeFilterType = null;
+    mediaView.resetFilter();
+    mediaView.movePillToActiveFilter();
 
     const query = mediaView.getSearchQuery();
     state.currentQuery = query;
+    queryAtStart = query;
     if (!query.trim()) {
       mediaView.hideMediaFilters();
       mediaView.clearSearchResults();
-      toastView.showToast("Please enter a media name.");
+      mediaView.hidePaginationLoader();
+      toastView.showToast("Please enter a media name.", "warning");
       return;
     }
     const encodedQuery = encodeURIComponent(query);
+    mediaView.hideMediaFilters();
     mediaView.renderSpinner();
     const data = await model.request(
       `search/multi?query=${encodedQuery}&page=${state.currentPage}`,
+      signal,
     );
-    state.totalPages = data.total_pages;
+    if (queryAtStart !== state.currentQuery) return;
 
     if (data.results.length === 0) {
       mediaView.renderNoResults();
       return;
     }
 
-    state.medias = await model.prepareSearchResults(data);
-    state.movieGenres = await model.getMediaGenres("movie");
-    state.tvGenres = await model.getMediaGenres("tv");
-    mediaView.renderSearchMedia(
+    state.medias = await model.prepareSearchResults(data, signal);
+    if (state.medias.length === 0) {
+      mediaView.renderNoResults();
+      return;
+    }
+    state.movieGenres = await model.getMediaGenres("movie", signal);
+    signal.throwIfAborted();
+    state.tvGenres = await model.getMediaGenres("tv", signal);
+    signal.throwIfAborted();
+    state.totalPages = data.total_pages;
+    const filteredMedias = model.filterMediasByType(
       state.medias,
-      state.movieGenres,
-      state.tvGenres,
+      state.activeFilterType,
     );
+    if (filteredMedias.length === 0) {
+      mediaView.renderNoFilterResults(state.activeFilterType);
+      return;
+    }
+    mediaView.render({
+      medias: filteredMedias,
+      movieGenres: state.movieGenres,
+      tvGenres: state.tvGenres,
+    });
+    mediaView.resetLoadMoreObserver();
   } catch (err) {
+    if (err.name === "AbortError") return;
+    if (queryAtStart !== state.currentQuery) return;
     console.error(err);
     mediaView.clearSearchResults();
     toastView.showToast(
       "Unable to connect to the media service. Please check your internet connection or VPN.",
+      "error",
     );
   }
 };
 
-const filterMediaButtonGroup = function (e) {
-  const button = e.target.closest(".media-filter");
-  if (!button) return;
-  mediaView.moveFilterPill(button);
-};
-
-const filterMedia = function (e) {
-  e.preventDefault();
-  const filter = e.target.closest(".media-filter");
-  if (!filter) return;
-  activeFilter = filter;
-  state.activeFilterType = filter.dataset.type;
+const filterMedia = function (filterType) {
+  state.activeFilterType = filterType;
   const filteredMedias = model.filterMediasByType(
     state.medias,
     state.activeFilterType,
   );
-  mediaView.renderSearchMedia(
-    filteredMedias,
-    state.movieGenres,
-    state.tvGenres,
-  );
-  observer.unobserve(sentinel);
-  observer.observe(sentinel);
-};
-
-// ${movie.genres
-//                   .map((genreID) => {
-//                     return genres.genres.find((genre) => genre.id === genreID)
-//                       .name;
-//                   })
-//                   .join(", ")}
-
-const observeCallback = function (entries, observer) {
-  entries.forEach((entry) => {
-    if (
-      entry.isIntersecting &&
-      state.isLoading === false &&
-      state.currentQuery.trim() !== "" &&
-      state.currentPage < state.totalPages
-    ) {
-      state.isLoading = true;
-      loadNextPage();
+  if (filteredMedias.length === 0) {
+    if (state.currentPage === state.totalPages) {
+      mediaView.renderNoFilterResults(filterType);
+    } else {
+      mediaView.clearSearchResults();
+      mediaView.resetLoadMoreObserver();
     }
+    return;
+  }
+  mediaView.render({
+    medias: filteredMedias,
+    movieGenres: state.movieGenres,
+    tvGenres: state.tvGenres,
   });
+  mediaView.resetLoadMoreObserver();
 };
 
-const observeOptions = {
-  root: null,
-  rootMargin: "200px",
-  threshold: 0.1,
+const controlLoadMore = function () {
+  if (
+    state.isLoading === false &&
+    state.currentQuery.trim() !== "" &&
+    state.currentPage < state.totalPages
+  ) {
+    state.isLoading = true;
+    loadNextPage();
+  }
 };
-const observer = new IntersectionObserver(observeCallback, observeOptions);
-observer.observe(sentinel);
 
-btnNavOpen.addEventListener("click", (e) => {
-  e.preventDefault();
-  sidebarView.asideOpenMobile();
-});
-btnNavClose.addEventListener("click", (e) => {
-  e.preventDefault();
-  sidebarView.asideCloseMobile();
-});
-overlay.addEventListener("click", (e) => {
-  e.preventDefault();
-  sidebarView.asideCloseMobile();
-});
-btnAsideToggle.addEventListener("click", () => {
-  state.isSidebarCollapsed = !state.isSidebarCollapsed;
-  sidebarView.asideToggle(state.isSidebarCollapsed);
-});
-
-btnTheme.addEventListener("click", (e) => {
-  e.preventDefault();
-  themeView.toggleTheme();
-});
-searchForm.addEventListener("submit", getSearchMedias);
-mediaFilters.addEventListener("click", filterMedia);
-mediaFilters.addEventListener("mouseover", filterMediaButtonGroup);
-mediaFilters.addEventListener("mouseleave", () => {
-  mediaView.moveFilterPill(activeFilter);
-});
-mediaView.initSearchInput();
-mediaView.initClearButton();
+const init = function () {
+  mediaView.addHandlerSearch(getSearchMedias);
+  mediaView.addHandlerFilter(filterMedia);
+  mediaView.addHandlerFilterHover();
+  mediaView.addHandlerFilterLeave(() => mediaView.movePillToActiveFilter());
+  mediaView.addHandlerLoadMore(controlLoadMore);
+  sidebarView.addHandlerNavOpen(() => {
+    sidebarView.asideOpenMobile();
+  });
+  sidebarView.addHandlerNavClose(() => {
+    sidebarView.asideCloseMobile();
+  });
+  sidebarView.addHandlerOverlay(() => {
+    sidebarView.asideCloseMobile();
+  });
+  sidebarView.addHandlerAsideToggle(() => {
+    state.isSidebarCollapsed = !state.isSidebarCollapsed;
+    sidebarView.asideToggle(state.isSidebarCollapsed);
+  });
+  themeView.addHandlerToggleTheme(() => {
+    themeView.toggleTheme();
+  });
+  mediaView.initSearchInput();
+  mediaView.initClearButton();
+  state.activeFilterType = mediaView.getActiveFilterType();
+};
+init();
