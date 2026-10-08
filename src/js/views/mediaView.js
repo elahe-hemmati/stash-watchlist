@@ -17,6 +17,7 @@ class MediaView extends View {
   _searchForm = document.querySelector(".search-form");
   _sentinel = document.querySelector(".sentinel");
   _activeFilter = document.querySelector(".media-filter");
+  _addWatchlistBtn = document.querySelector(".add-to-watchlist-btn");
   _observer;
 
   // ************rendering:
@@ -69,6 +70,10 @@ class MediaView extends View {
   }
   hidePaginationLoader() {
     this._loader.classList.add("hidden");
+  }
+  resetLoadMoreObserver() {
+    this._observer.unobserve(this._sentinel);
+    this._observer.observe(this._sentinel);
   }
   // *******************
 
@@ -198,9 +203,24 @@ class MediaView extends View {
     );
     this._observer.observe(this._sentinel);
   }
-  resetLoadMoreObserver() {
-    this._observer.unobserve(this._sentinel);
-    this._observer.observe(this._sentinel);
+
+  addHandlerAddToWatchlist(handler) {
+    this._parentElement.addEventListener("click", (e) => {
+      const btn = e.target.closest(".add-to-watchlist-btn");
+      if (!btn) return;
+      const { id, type } = btn.dataset;
+      handler(id, type);
+    });
+  }
+  // ****************
+
+  // *******watchlist icon
+  updateWatchlistIcon(id, type, isAdded) {
+    const btn = this._parentElement.querySelector(
+      `.add-to-watchlist-btn[data-id="${id}"][data-type="${type}"]`,
+    );
+    const img = btn.querySelector("img");
+    img.src = isAdded ? assets.bookmarkFilled : assets.bookmark;
   }
   // ****************
 

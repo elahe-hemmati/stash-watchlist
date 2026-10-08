@@ -1,4 +1,5 @@
 import { TOKEN, BASE_URL } from "../config.js";
+import { state } from "../state.js";
 
 const options = {
   method: "GET",

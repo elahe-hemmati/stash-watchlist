@@ -18,3 +18,11 @@ export const starEmpty = new URL(
   "../../img/icons/star_empty.svg",
   import.meta.url,
 );
+export const bookmark = new URL(
+  "../../img/icons/bookmark.svg",
+  import.meta.url,
+);
+export const bookmarkFilled = new URL(
+  "../../img/icons/bookmark-filled.svg",
+  import.meta.url,
+);
