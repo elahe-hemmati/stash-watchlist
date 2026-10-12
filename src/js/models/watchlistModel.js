@@ -35,6 +35,11 @@ const removeFromWatchlist = function (media) {
   );
 };
 
+export const deleteFromWatchlist = function (id, type) {
+  removeFromWatchlist({ id: Number(id), type });
+  saveWatchlist();
+};
+
 export const saveWatchlist = function () {
   localStorage.setItem("watchlist", JSON.stringify(state.watchlist));
 };
@@ -42,4 +47,13 @@ export const saveWatchlist = function () {
 export const loadWatchlist = function () {
   const data = localStorage.getItem("watchlist");
   state.watchlist = data ? JSON.parse(data) : [];
+};
+
+export const toggleWatched = function (id, type) {
+  const media = state.watchlist.find(
+    (item) => item.id === Number(id) && item.type === type,
+  );
+  if (!media) return;
+  media.watched = !media.watched;
+  saveWatchlist();
 };

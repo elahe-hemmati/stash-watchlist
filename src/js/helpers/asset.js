@@ -26,3 +26,7 @@ export const bookmarkFilled = new URL(
   "../../img/icons/bookmark-filled.svg",
   import.meta.url,
 );
+export const deleteIcon = new URL(
+  "../../img/icons/delete.svg",
+  import.meta.url,
+);

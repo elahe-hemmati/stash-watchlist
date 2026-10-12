@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -135,8 +135,8 @@
 
           <!-- Watchlist BTN -->
           <div class="group relative">
-            <button
-              type="button"
+            <a
+              href="./watchlist.html"
               class="grid h-[3rem] w-full grid-cols-[1.25rem_1fr] items-center justify-items-start gap-4 rounded-md p-2 text-sm leading-5 font-medium hover:bg-gray-200/50 lg:inline-grid dark:hover:bg-gray-600/50"
             >
               <img
@@ -148,7 +148,7 @@
               <p class="aside-text transition-opacity duration-300 lg:hidden">
                 Watchlist
               </p>
-            </button>
+            </a>
             <span
               class="dark:text-light-cream text-dark-black tooltip dark:border-light-cream/20 border-dark-black/20 invisible absolute top-2 left-full ml-2 rounded-full border-1 bg-gray-200/80 px-2 py-1 text-sm font-bold whitespace-nowrap opacity-0 group-hover:visible group-hover:opacity-100 dark:bg-gray-600/80"
             >
@@ -170,8 +170,7 @@
             >
               <span class="inline-block overflow-hidden align-bottom">
                 <span
-                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
-                  style="animation-delay: 0s"
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0s]"
                 >
                   Discover,
                 </span>
@@ -179,8 +178,7 @@
 
               <span class="inline-block overflow-hidden align-bottom">
                 <span
-                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
-                  style="animation-delay: 0.05s"
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.05s]"
                 >
                   save,
                 </span>
@@ -188,8 +186,7 @@
 
               <span class="inline-block overflow-hidden align-bottom">
                 <span
-                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
-                  style="animation-delay: 0.1s"
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.1s]"
                 >
                   and
                 </span>
@@ -197,8 +194,7 @@
 
               <span class="inline-block overflow-hidden align-bottom">
                 <span
-                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
-                  style="animation-delay: 0.15s"
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.15s]"
                 >
                   <span
                     class="animate-[shine_7s_linear_infinite] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.5)_15%,transparent_45%),linear-gradient(to_right,#eab308,#fde047)] bg-[length:200%_100%,100%_100%] bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(250,204,21,0.35)]"
@@ -381,6 +377,6 @@
     </div>
 
     <!-- script -->
-    <script type="module" src="./js/controllers/controller.js"></script>
+    <script type="module" src="./js/controllers/mediaController.js"></script>
   </body>
 </html>

@@ -1,8 +1,8 @@
+import initSharedController from "./sharedController.js";
 import * as model from "../models/mediaModel.js";
+import * as sharedModel from "../models/sharedModel.js";
 import * as watchlistModel from "../models/watchlistModel.js";
 import mediaView from "../views/mediaView.js";
-import sidebarView from "../views/sidebarView.js";
-import themeView from "../views/themeView.js";
 import toastView from "../views/toastView.js";
 import { state } from "../state.js";
 import "core-js/stable";
@@ -10,7 +10,7 @@ import "regenerator-runtime/runtime";
 
 let searchController, paginationController;
 const prepareMediasForView = function (medias, filterType) {
-  const filteredMedias = model.filterMediasByType(medias, filterType);
+  const filteredMedias = sharedModel.filterMediasByType(medias, filterType);
 
   return filteredMedias.map((media) => ({
     ...media,
@@ -34,7 +34,8 @@ const loadNextPage = async function () {
     state.currentPage = nextPage;
     const type = state.activeFilterType;
     state.medias = state.medias.concat(newMedias);
-    const hasAnyMatch = model.filterMediasByType(state.medias, type).length > 0;
+    const hasAnyMatch =
+      sharedModel.filterMediasByType(state.medias, type).length > 0;
     if (!hasAnyMatch && nextPage === state.totalPages) {
       mediaView.renderNoFilterResults(type);
       return;
@@ -168,13 +169,14 @@ const controlAddToWatchlist = function (id, type) {
   const media = state.medias.find(
     (media) => media.id === Number(id) && media.type === type,
   );
+  if (!media) return;
   const isAdded = watchlistModel.toggleWatchlist(media);
   mediaView.updateWatchlistIcon(id, type, isAdded);
   watchlistModel.saveWatchlist();
 };
 
 const init = function () {
-  themeView.loadTheme();
+  initSharedController();
   watchlistModel.loadWatchlist();
   mediaView.addHandlerSearch(getSearchMedias);
   mediaView.addHandlerFilter(filterMedia);
@@ -185,21 +187,5 @@ const init = function () {
   mediaView.initClearButton();
   state.activeFilterType = mediaView.getActiveFilterType();
   mediaView.addHandlerAddToWatchlist(controlAddToWatchlist);
-  sidebarView.addHandlerNavOpen(() => {
-    sidebarView.asideOpenMobile();
-  });
-  sidebarView.addHandlerNavClose(() => {
-    sidebarView.asideCloseMobile();
-  });
-  sidebarView.addHandlerOverlay(() => {
-    sidebarView.asideCloseMobile();
-  });
-  sidebarView.addHandlerAsideToggle(() => {
-    state.isSidebarCollapsed = !state.isSidebarCollapsed;
-    sidebarView.asideToggle(state.isSidebarCollapsed);
-  });
-  themeView.addHandlerToggleTheme(() => {
-    themeView.toggleTheme();
-  });
 };
 init();

@@ -25,7 +25,9 @@ export const formatRuntime = function (media) {
           media.runtime - Math.floor(media.runtime / 60) * 60
         }m`
       : "N/A"
-    : `${media.seasons} S · ${media.episodes} EP`;
+    : media.seasons != null && media.episodes != null
+      ? `${media.seasons} S · ${media.episodes} EP`
+      : "N/A";
 };
 
 export const escapeHTML = (str) => {

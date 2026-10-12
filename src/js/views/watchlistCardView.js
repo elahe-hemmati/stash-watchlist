@@ -1,0 +1,53 @@
+import * as assets from "../helpers/asset.js";
+import * as helper from "../helpers/helper.js";
+import posterView from "./posterView.js";
+
+class WatchlistCardView extends posterView {
+  createWatchlistCard(media) {
+    const mediaTypeBadge =
+      media.type === "movie" ? "bg-amber-300/80" : "bg-orange-500/80";
+    const hasPoster = Boolean(media.poster);
+    return `
+               <div
+              class="watchlist-card-wrapper relative rounded-xl border-2 border-transparent p-[1px] hover:[animation:border_2.5s_linear_infinite] hover:[background:linear-gradient(white,white)_padding-box,conic-gradient(from_var(--border-angle),transparent_25%,#f59e0b_50%,transparent_75%)_border-box] dark:hover:[background:linear-gradient(#18181b,#18181b)_padding-box,conic-gradient(from_var(--border-angle),transparent_25%,#f59e0b_50%,transparent_75%)_border-box]"
+            >
+                <div class="watchlist-card relative w-full max-w-[280px] overflow-hidden rounded-xl shadow-[0_8px_20px_rgba(0,0,0,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15)]">
+                 <span class="absolute top-2 left-2 z-10 rounded-md px-2 py-1 text-[10px] font-semibold tracking-wide text-white ${mediaTypeBadge}">
+                    ${media.type === "movie" ? "MOVIE" : "TV SHOW"}</span>
+                  <button
+                     class="remove-from-watchlist-btn group absolute top-2 right-2 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-amber-300/50 hover:bg-black/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/70" aria-label="Remove from Watchlist" title="Remove from Watchlist" data-id="${media.id}" data-type="${media.type}">
+                    <img
+                    src="${assets.deleteIcon}"
+                      class="h-5 w-5 transition-transform duration-300"
+                    >
+                  </button>  
+                   <div class="poster-wrapper relative aspect-[2/3] w-full bg-[radial-gradient(circle_at_center,rgba(234,179,8,0.18),transparent_55%),linear-gradient(145deg,#18181b,#09090b)] ${hasPoster ? "animate-pulse" : ""}">
+                    <div class="poster-error ${hasPoster ? "hidden" : ""} absolute inset-0 flex items-center justify-center">
+                      <img src="${assets.imageError}" class="w-6 h-6">
+                    </div>${
+                      hasPoster
+                        ? `<img
+                          alt="${helper.escapeHTML(media.title)}"
+                          src="${helper.getPosterUrl(media.poster)}"
+                          loading="lazy"
+                          width="500"
+                          height="750"
+                          decoding="async"
+                          class="media-poster w-full h-full object-cover opacity-0 transition-opacity duration-300"/>`
+                        : ""
+                    }</div>
+                  <div class="absolute bottom-0 left-0 h-3/4 w-full bg-gradient-to-t from-black to-transparent"></div>
+    
+                  <div class="media-details text-light-cream absolute bottom-3 left-2 mx-5">
+                      <h2 class="media-title line-clamp-1 text-lg sm:line-clamp-2 sm:text-xl">${helper.escapeHTML(media.title)}</h2>
+
+                    <button type="button"
+                    class="toggle-watched-btn mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-lg transition duration-200 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 ${media.watched ? "border-orange-500 bg-stone-800 text-orange-300 hover:bg-stone-700" : "border-amber-300/40 bg-amber-300 text-zinc-900 hover:bg-amber-200"}" data-id="${media.id}" data-type="${media.type}">
+                    ${media.watched ? "Mark as Unwatched" : "Mark as Watched"}
+                    </button>
+                  </div>
+                </div>
+                </div>`;
+  }
+}
+export default new WatchlistCardView();
