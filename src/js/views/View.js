@@ -23,7 +23,44 @@ export default class View {
       </p>
     </div>`;
   }
+  // ********Search input
+  getSearchQuery() {
+    return this._searchInput.value;
+  }
 
+  clearSearchInput() {
+    this._searchInput.value = "";
+    this._clearSearchButton.classList.add("hidden");
+    this._clearSearchButton.classList.remove("flex");
+    this._searchInput.focus();
+  }
+
+  toggleClearButton() {
+    const hasValue = !!this._searchInput.value;
+    this._clearSearchButton.classList.toggle("hidden", !hasValue);
+    this._clearSearchButton.classList.toggle("flex", hasValue);
+  }
+
+  initSearchInput() {
+    this._searchInput.addEventListener("input", () => {
+      this.toggleClearButton();
+    });
+  }
+
+  initClearButton() {
+    this._clearSearchButton.addEventListener("click", () => {
+      this.clearSearchInput();
+    });
+  }
+
+  addHandlerSearch(handler) {
+    this._searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      handler();
+    });
+  }
+
+  // *********** Filter state and UI
   setActiveFilter(filter) {
     this._activeFilter = filter;
   }
@@ -36,12 +73,12 @@ export default class View {
     this.setActiveFilter(allFilter);
   }
 
-  movePillToActiveFilter() {
-    this.moveFilterPill(this._activeFilter);
-  }
-
   getActiveFilterType() {
     return this._activeFilter.dataset.type;
+  }
+
+  movePillToActiveFilter() {
+    this.moveFilterPill(this._activeFilter);
   }
 
   moveFilterPill(filter) {
@@ -57,6 +94,7 @@ export default class View {
     this._mediaFilters.classList.remove("invisible");
   }
 
+  // **********Filter events
   _handleFilterHover(e) {
     const button = e.target.closest(".media-filter");
     if (!button) return;

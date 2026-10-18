@@ -9,4 +9,5 @@ export const state = {
   tvGenres: [],
   activeFilterType: null,
   watchlist: [],
+  activeSort: "added",
 };

@@ -3,6 +3,7 @@ import * as model from "../models/mediaModel.js";
 import * as sharedModel from "../models/sharedModel.js";
 import * as watchlistModel from "../models/watchlistModel.js";
 import mediaView from "../views/mediaView.js";
+import confirmView from "../views/confirmView.js";
 import toastView from "../views/toastView.js";
 import { state } from "../state.js";
 import "core-js/stable";
@@ -95,12 +96,10 @@ const getSearchMedias = async function () {
       signal,
     );
     if (queryAtStart !== state.currentQuery) return;
-
     if (data.results.length === 0) {
       mediaView.renderNoResults();
       return;
     }
-
     state.medias = await model.prepareSearchResults(data, signal);
     if (state.medias.length === 0) {
       mediaView.renderNoResults();
@@ -165,14 +164,25 @@ const controlLoadMore = function () {
   }
 };
 
-const controlAddToWatchlist = function (id, type) {
+const controlAddToWatchlist = async function (id, type) {
   const media = state.medias.find(
     (media) => media.id === Number(id) && media.type === type,
   );
   if (!media) return;
+  const isAlreadyAdded = watchlistModel.isInWatchlist(media);
+  if (isAlreadyAdded) {
+    const confirmed = await confirmView.confirm();
+    if (!confirmed) return;
+    watchlistModel.deleteFromWatchlist(id, type);
+    mediaView.updateWatchlistIcon(id, type, false);
+    toastView.showToast("Removed from your watchlist.", "success");
+    return;
+  }
   const isAdded = watchlistModel.toggleWatchlist(media);
   mediaView.updateWatchlistIcon(id, type, isAdded);
-  watchlistModel.saveWatchlist();
+  if (isAdded) {
+    toastView.showToast("Added to your watchlist.", "success");
+  }
 };
 
 const init = function () {
@@ -187,5 +197,7 @@ const init = function () {
   mediaView.initClearButton();
   state.activeFilterType = mediaView.getActiveFilterType();
   mediaView.addHandlerAddToWatchlist(controlAddToWatchlist);
+  confirmView.addHandlerConfirm();
+  confirmView.addHandlerCancel();
 };
 init();

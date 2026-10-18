@@ -11,7 +11,7 @@ class MediaView extends View {
 `;
   _loader = document.querySelector(".pagination-loader");
   _pill = document.querySelector(".pill");
-  _searchMediasInput = document.querySelector(".search-media");
+  _searchInput = document.querySelector(".search-media");
   _clearSearchButton = document.querySelector(".btn-clear");
   _mediaFilters = document.querySelector(".media-filters");
   _searchForm = document.querySelector(".search-form");
@@ -44,6 +44,9 @@ class MediaView extends View {
       previousCount,
     );
     mediaCardView.setupPosterEvents(newMediaCards);
+  }
+  clearSearchResults() {
+    this.clear();
   }
   // ****************
 
@@ -80,44 +83,7 @@ class MediaView extends View {
   }
   // ***************
 
-  // *************search input:
-  getSearchQuery() {
-    return this._searchMediasInput.value;
-  }
-  clearSearchResults() {
-    this.clear();
-  }
-  clearSearchInput() {
-    this._searchMediasInput.value = "";
-    this._clearSearchButton.classList.add("hidden");
-    this._clearSearchButton.classList.remove("flex");
-    this._searchMediasInput.focus();
-  }
-  toggleClearButton() {
-    const hasValue = !!this._searchMediasInput.value;
-    this._clearSearchButton.classList.toggle("hidden", !hasValue);
-    this._clearSearchButton.classList.toggle("flex", hasValue);
-  }
-  initSearchInput() {
-    this._searchMediasInput.addEventListener("input", () => {
-      this.toggleClearButton();
-    });
-  }
-  initClearButton() {
-    this._clearSearchButton.addEventListener("click", () => {
-      this.clearSearchInput();
-    });
-  }
-  // *******************
-
   // *********handlers:
-  addHandlerSearch(handler) {
-    this._searchForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      handler();
-    });
-  }
-
   addHandlerLoadMore(handler) {
     this._observer = new IntersectionObserver(
       (entries) => {

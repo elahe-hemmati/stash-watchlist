@@ -57,3 +57,21 @@ export const toggleWatched = function (id, type) {
   media.watched = !media.watched;
   saveWatchlist();
 };
+
+export const sortWatchlist = function (medias, sortType) {
+  if (sortType === "added") {
+    return medias.toReversed();
+  }
+  if (sortType === "title") {
+    return medias.toSorted((a, b) => a.title.localeCompare(b.title));
+  }
+  if (sortType === "watched") {
+    return medias.toSorted((a, b) => a.watched - b.watched);
+  }
+};
+
+export const searchWatchlist = function (query) {
+  return state.watchlist.filter((media) =>
+    media.title.toLowerCase().includes(query.toLowerCase()),
+  );
+};
