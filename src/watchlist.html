@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stash Watchlist</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./img/favicon/favicon.ico" />
+    <link href="./input.css" rel="stylesheet" />
+  </head>
+  <!-- *******BODY******* -->
+  <body class="dark:text-light-cream text-dark-black text-sm sm:text-base">
+    <!-- Background Color -->
+    <div class="fixed inset-0 z-[-20] bg-white"></div>
+    <div
+      class="fixed inset-0 -z-20 bg-black opacity-0 transition-opacity duration-500 dark:opacity-100"
+    ></div>
+    <!-- Background Effects -->
+    <div class="relative">
+      <!-- Light Grid -->
+      <div
+        class="absolute inset-0 bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-100 transition-opacity duration-500 sm:bg-[size:4rem_4rem] lg:bg-[size:5rem_5rem] dark:opacity-0"
+      ></div>
+      <!-- Dark Grid -->
+      <div
+        class="absolute inset-0 bg-[linear-gradient(to_right,#332b1772_1px,transparent_1px),linear-gradient(to_bottom,#332b1772_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-0 transition-opacity duration-500 sm:bg-[size:4rem_4rem] lg:bg-[size:5rem_5rem] dark:opacity-100"
+      ></div>
+      <!-- Top Glow -->
+      <div
+        class="pointer-events-none absolute top-0 right-0 h-[100vh] w-full bg-[radial-gradient(circle_250px_at_100%_200px,rgba(250,204,21,0.32),transparent)] lg:bg-[radial-gradient(circle_500px_at_100%_200px,rgba(250,204,21,0.32),transparent)]"
+      ></div>
+
+      <!-- ***--***LAYOUT***--*** -->
+      <div class="layout relative lg:flex">
+        <!-- *********MENU******** -->
+        <!-- Navbar -->
+        <nav class="sticky top-0 z-50 h-[3.75rem] w-full p-3 lg:hidden">
+          <!-- Open Nav BTN -->
+          <button
+            type="button"
+            class="btn-nav--open rounded-md p-2 text-center hover:bg-gray-200/50 dark:hover:bg-gray-600/50"
+          >
+            <img src="./img/icons/menu.svg" alt="menu" class="h-5 w-5" />
+          </button>
+        </nav>
+        <!-- Nav Overlay -->
+        <div
+          class="overlay fixed inset-0 z-40 hidden bg-black/30 backdrop-blur-[3px] lg:hidden"
+        ></div>
+
+        <!-- Sidebar -->
+        <aside
+          class="aside dark:border-light-cream/20 border-dark-black/20 bg-light-cream dark:bg-dark-black fixed top-0 left-0 z-100 flex h-screen w-[10rem] -translate-x-full flex-col gap-4 border-r-1 p-3 transition-transform duration-500 lg:sticky lg:top-0 lg:w-[clamp(3rem,5vw,4.5rem)] lg:translate-x-0 lg:bg-white/40 lg:transition-[width] lg:duration-500 lg:dark:bg-black/40"
+        >
+          <!-- Close Nav BTN -->
+          <div class="aside-head flex flex-row justify-between">
+            <img
+              src="./img/stash-logo-s.png"
+              alt="stash logo"
+              class="stash-logo-s my-2 h-5 w-5 lg:mx-2"
+            />
+            <img
+              src="./img/stash-logo-full.png"
+              alt="stash logo"
+              class="stash-logo-full my-2 hidden h-5 w-15 transition-transform duration-500 lg:mx-2"
+            />
+            <button
+              type="button"
+              class="btn-nav--close rounded-md p-2 text-center text-sm leading-5 font-medium hover:bg-gray-200/50 lg:hidden dark:hover:bg-gray-600/50"
+            >
+              <img src="./img/icons/close.svg" alt="menu" class="h-5 w-5" />
+            </button>
+          </div>
+
+          <!-- Toggle Aside BTN -->
+          <div class="group relative">
+            <button
+              type="button"
+              class="btn-aside--toggle hidden h-[3rem] w-full grid-cols-[1.25rem_1fr] items-center justify-items-start gap-4 rounded-md p-2 text-sm leading-5 font-medium hover:bg-gray-200/50 lg:inline-grid dark:hover:bg-gray-600/50"
+            >
+              <img
+                src="./img/icons/show_sidepanel.svg"
+                alt="show sidebar"
+                class="aside-icon--show col-start-1 row-start-1 h-5 w-5"
+              />
+
+              <img
+                src="./img/icons/hide_sidepanel.svg"
+                alt="hide sidebar"
+                class="aside-icon--hide col-start-1 row-start-1 hidden h-5 w-5"
+              />
+
+              <p class="aside-text transition-opacity duration-300 lg:hidden">
+                Close Sidebar
+              </p>
+            </button>
+
+            <span
+              class="dark:text-light-cream text-dark-black tooltip dark:border-light-cream/20 border-dark-black/20 invisible absolute top-2 left-full ml-2 rounded-full border-1 bg-gray-200/80 px-2 py-1 text-sm font-bold whitespace-nowrap opacity-0 group-hover:visible group-hover:opacity-100 dark:bg-gray-600/80"
+            >
+              Open Sidebar
+            </span>
+          </div>
+
+          <!-- Switch Theme BTN -->
+          <div class="group relative">
+            <button
+              type="button"
+              class="btn-theme grid h-[3rem] w-full grid-cols-[1.25rem_1fr] items-center justify-items-start gap-3 rounded-md p-2 text-sm leading-5 font-medium hover:bg-gray-200/50 lg:inline-grid dark:hover:bg-gray-600/50"
+            >
+              <img
+                src="./img/icons/sun.svg"
+                alt="light theme"
+                class="light-theme col-start-1 row-start-1 h-5 w-5 transition-all duration-500"
+              />
+
+              <img
+                src="./img/icons/moon.svg"
+                alt="dark theme"
+                class="dark-theme col-start-1 row-start-1 h-5 w-5 scale-0 rotate-90 opacity-0 transition-all duration-500"
+              />
+
+              <p
+                class="aside-text text-sm whitespace-nowrap transition-opacity duration-300 lg:hidden"
+              >
+                Switch Theme
+              </p>
+            </button>
+            <span
+              class="dark:text-light-cream text-dark-black tooltip dark:border-light-cream/20 border-dark-black/20 invisible absolute top-2 left-full ml-2 rounded-full border-1 bg-gray-200/80 px-2 py-1 text-sm font-bold whitespace-nowrap opacity-0 group-hover:visible group-hover:opacity-100 dark:bg-gray-600/80"
+            >
+              Switch Theme
+            </span>
+          </div>
+
+          <!-- Discover BTN -->
+          <div class="group relative">
+            <a
+              href="./index.html"
+              class="grid h-[3rem] w-full grid-cols-[1.25rem_1fr] items-center justify-items-start gap-4 rounded-md p-2 text-sm leading-5 font-medium hover:bg-gray-200/50 lg:inline-grid dark:hover:bg-gray-600/50"
+            >
+              <img
+                src="./img/icons/discover.svg"
+                alt="watchlist"
+                class="col-start-1 row-start-1 h-5 w-5"
+              />
+
+              <p class="aside-text transition-opacity duration-300 lg:hidden">
+                Discover
+              </p>
+            </a>
+            <span
+              class="dark:text-light-cream text-dark-black tooltip dark:border-light-cream/20 border-dark-black/20 invisible absolute top-2 left-full ml-2 rounded-full border-1 bg-gray-200/80 px-2 py-1 text-sm font-bold whitespace-nowrap opacity-0 group-hover:visible group-hover:opacity-100 dark:bg-gray-600/80"
+            >
+              Discover
+            </span>
+          </div>
+        </aside>
+
+        <!-- ********MAIN******* -->
+        <main
+          class="main flex min-h-[calc(100vh-3.75rem)] flex-1 flex-col items-center justify-center lg:min-h-screen"
+        >
+          <div
+            class="main-content mx-auto flex w-[90%] max-w-[75rem] flex-col items-center gap-9"
+          >
+            <!-- Header -->
+            <h1
+              class="text-3xl leading-tight font-bold sm:text-4xl lg:text-5xl"
+            >
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0s]"
+                >
+                  Your
+                </span>
+              </span>
+
+              <span class="inline-block overflow-hidden align-bottom">
+                <span
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.25s]"
+                >
+                  <span
+                    class="animate-[shine_7s_linear_infinite] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.5)_15%,transparent_45%),linear-gradient(to_right,#eab308,#fde047)] bg-[length:200%_100%,100%_100%] bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(250,204,21,0.35)]"
+                  >
+                    Watchlist
+                  </span>
+                </span>
+              </span>
+            </h1>
+
+            <!-- Search -->
+            <form class="search-form relative w-full max-w-xl">
+              <input
+                type="search"
+                placeholder="Search your watchlist..."
+                class="search-media m-auto w-full rounded-xl border border-zinc-200/70 bg-zinc-100/70 px-4 py-2 pr-11 text-sm text-zinc-800 backdrop-blur-md transition-all duration-300 ease-out outline-none placeholder:text-zinc-400 focus:border-amber-500/60 focus:bg-zinc-100/80 focus:ring-2 focus:ring-amber-500/15 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-500 dark:focus:bg-white/10"
+                name="search"
+                autocomplete="off"
+              />
+
+              <button
+                type="button"
+                class="btn-clear absolute top-1/2 right-12 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg transition-colors duration-200 hover:bg-zinc-900/10 dark:hover:bg-white/10"
+              >
+                <img
+                  src="./img/icons/close.svg"
+                  alt="Clear search"
+                  class="h-4 w-4"
+                />
+              </button>
+              <div class="group">
+                <button
+                  type="submit"
+                  class="btn-search absolute top-1/2 right-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg transition-colors duration-200 hover:bg-zinc-900/10 dark:hover:bg-white/10"
+                >
+                  <img
+                    src="./img/icons/search.svg"
+                    alt="search"
+                    class="h-5 w-5"
+                  />
+                </button>
+
+                <span
+                  class="tooltip invisible absolute right-0 bottom-full mb-2 rounded-full border border-zinc-200/70 bg-zinc-100/80 px-2 py-1 text-sm font-bold whitespace-nowrap text-zinc-800 opacity-0 backdrop-blur-md transition-opacity duration-200 group-hover:visible group-hover:opacity-100 lg:top-1 lg:right-auto lg:bottom-auto lg:left-full lg:ml-2 dark:border-white/10 dark:bg-zinc-800/80 dark:text-white"
+                >
+                  Search
+                </span>
+              </div>
+            </form>
+
+            <!-- Filter & Sort Toolbar -->
+            <div
+              id="watchlist-toolbar"
+              class="flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-between"
+            >
+              <!-- Sort -->
+              <div
+                class="sort flex w-full items-center justify-center gap-2 sm:w-auto sm:justify-end"
+              >
+                <label
+                  for="watchlist-sort"
+                  class="shrink-0 text-xs font-medium text-gray-500 min-[411px]:text-sm dark:text-gray-400"
+                >
+                  Sort by:
+                </label>
+
+                <div class="custom-sort relative">
+                  <!-- Sort Trigger -->
+                  <button
+                    id="watchlist-sort"
+                    type="button"
+                    class="sort-trigger flex items-center gap-3 rounded-xl border border-zinc-200/70 bg-zinc-100/70 p-1 text-xs text-zinc-700 backdrop-blur-md transition-colors duration-200 hover:bg-zinc-200/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 dark:hover:bg-white/10"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                  >
+                    <span
+                      class="sort-selected rounded-lg px-3 py-1.5 font-medium"
+                    >
+                      Recently Added
+                    </span>
+
+                    <svg
+                      class="sort-chevron mr-2 h-4 w-4 shrink-0 transition-transform duration-200"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+
+                  <!-- Sort Menu -->
+                  <ul
+                    class="sort-menu absolute top-full right-0 z-30 mt-2 hidden min-w-full overflow-hidden rounded-xl border border-zinc-200/70 bg-zinc-100/95 p-1 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/95"
+                    role="listbox"
+                    aria-label="Sort watchlist"
+                  >
+                    <li>
+                      <button
+                        type="button"
+                        class="sort-option w-full rounded-lg bg-amber-500/10 px-3 py-2 text-left text-sm font-medium text-amber-700 transition-colors duration-200 hover:bg-amber-500/15 dark:text-amber-300"
+                        role="option"
+                        data-sort="added"
+                        aria-selected="true"
+                      >
+                        Recently Added
+                      </button>
+                    </li>
+
+                    <li>
+                      <button
+                        type="button"
+                        class="sort-option w-full rounded-lg px-3 py-2 text-left text-sm text-zinc-700 transition-colors duration-200 hover:bg-zinc-200/70 dark:text-zinc-200 dark:hover:bg-white/10"
+                        role="option"
+                        data-sort="title"
+                        aria-selected="false"
+                      >
+                        Title (A–Z)
+                      </button>
+                    </li>
+
+                    <li>
+                      <button
+                        type="button"
+                        class="sort-option w-full rounded-lg px-3 py-2 text-left text-sm text-zinc-700 transition-colors duration-200 hover:bg-zinc-200/70 dark:text-zinc-200 dark:hover:bg-white/10"
+                        role="option"
+                        data-sort="watched"
+                        aria-selected="false"
+                      >
+                        Unwatched First
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Media Filters -->
+              <div
+                class="media-filters relative inline-flex max-w-full items-center gap-0.5 overflow-hidden rounded-xl border border-zinc-200/70 bg-zinc-100/70 p-1 dark:border-white/10 dark:bg-white/5"
+              >
+                <span
+                  class="pill absolute top-0 left-1 h-px w-12 rounded-full bg-gradient-to-r from-transparent via-amber-500/90 to-transparent shadow-[0_6px_24px_10px_rgba(245,158,11,0.45)] transition-all duration-300 dark:via-amber-300/80 dark:shadow-[0_6px_24px_10px_rgba(251,191,36,0.35)]"
+                ></span>
+
+                <button
+                  class="media-filter relative z-10 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-600 transition-colors duration-200 hover:text-zinc-950 min-[411px]:px-3 min-[411px]:py-2 min-[411px]:text-sm dark:text-zinc-400 dark:hover:text-white"
+                  data-type="all"
+                >
+                  All
+                </button>
+
+                <button
+                  class="media-filter relative z-10 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-600 transition-colors duration-200 hover:text-zinc-950 min-[411px]:px-3 min-[411px]:py-2 min-[411px]:text-sm dark:text-zinc-400 dark:hover:text-white"
+                  data-type="movie"
+                >
+                  Movies
+                </button>
+
+                <button
+                  class="media-filter relative z-10 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-600 transition-colors duration-200 hover:text-zinc-950 min-[411px]:px-3 min-[411px]:py-2 min-[411px]:text-sm dark:text-zinc-400 dark:hover:text-white"
+                  data-type="tv"
+                >
+                  TV Shows
+                </button>
+              </div>
+            </div>
+
+            <!-- Search Results Container -->
+            <div
+              class="watchlist-results-container grid grid-cols-1 gap-4 p-3 min-[411px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            ></div>
+          </div>
+        </main>
+
+        <!-- Toast -->
+        <div
+          class="toast fixed top-1/2 left-1/2 z-50 hidden -translate-x-1/2 -translate-y-1/2 [animation:border_4s_linear_infinite] rounded-xl border-2 border-transparent px-4 py-3 text-center text-sm text-zinc-900 shadow-lg [background:linear-gradient(white,white)_padding-box,conic-gradient(from_var(--border-angle),transparent_25%,var(--toast-color)_50%,transparent_75%)_border-box] dark:text-white dark:[background:linear-gradient(#18181b,#18181b)_padding-box,conic-gradient(from_var(--border-angle),transparent_25%,var(--toast-color)_50%,transparent_75%)_border-box]"
+        >
+          <span class="toast-message"></span>
+        </div>
+
+        <!-- Confirmation Modal -->
+        <div
+          id="confirm-modal"
+          class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/40 p-4 backdrop-blur-sm dark:bg-black/60"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-modal-title"
+          aria-describedby="confirm-modal-description"
+        >
+          <div
+            class="border-dark-black/10 bg-light-cream/70 text-dark-black dark:bg-dark-black/20 dark:text-light-cream w-full max-w-md rounded-2xl border p-6 shadow-2xl backdrop-blur-xl transition-colors dark:border-white/10"
+          >
+            <!-- Icon -->
+            <div
+              class="bg-dark-orange/10 text-dark-orange mb-5 flex h-12 w-12 items-center justify-center rounded-xl"
+              aria-hidden="true"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 6h18" />
+                <path d="M8 6V4h8v2" />
+                <path d="m19 6-1 14H6L5 6" />
+                <path d="M10 11v5M14 11v5" />
+              </svg>
+            </div>
+
+            <!-- Message -->
+            <h2
+              id="confirm-modal-title"
+              class="mb-2 text-xl font-semibold tracking-tight"
+            >
+              Remove from watchlist?
+            </h2>
+
+            <p
+              id="confirm-modal-description"
+              class="mb-7 text-sm leading-6 opacity-70"
+            >
+              Are you sure you want to remove this from your watchlist?
+            </p>
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-3">
+              <button
+                id="confirm-cancel"
+                type="button"
+                class="border-dark-black/15 text-dark-black hover:bg-dark-black/5 focus-visible:outline-dark-orange dark:text-light-cream rounded-lg border px-4 py-2.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-white/15 dark:hover:bg-white/5"
+              >
+                Cancel
+              </button>
+
+              <button
+                id="confirm-remove"
+                type="button"
+                class="bg-dark-orange focus-visible:outline-dark-orange rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Glow -->
+        <div
+          class="pointer-events-none absolute right-0 bottom-0 h-[700px] w-full bg-[radial-gradient(circle_500px_at_0%_100%,rgba(250,204,21,0.22),transparent)]"
+        ></div>
+      </div>
+    </div>
+
+    <!-- script -->
+    <script
+      type="module"
+      src="./js/controllers/watchlistController.js"
+    ></script>
+  </body>
+</html>

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -135,8 +135,8 @@
 
           <!-- Watchlist BTN -->
           <div class="group relative">
-            <button
-              type="button"
+            <a
+              href="./watchlist.html"
               class="grid h-[3rem] w-full grid-cols-[1.25rem_1fr] items-center justify-items-start gap-4 rounded-md p-2 text-sm leading-5 font-medium hover:bg-gray-200/50 lg:inline-grid dark:hover:bg-gray-600/50"
             >
               <img
@@ -148,7 +148,7 @@
               <p class="aside-text transition-opacity duration-300 lg:hidden">
                 Watchlist
               </p>
-            </button>
+            </a>
             <span
               class="dark:text-light-cream text-dark-black tooltip dark:border-light-cream/20 border-dark-black/20 invisible absolute top-2 left-full ml-2 rounded-full border-1 bg-gray-200/80 px-2 py-1 text-sm font-bold whitespace-nowrap opacity-0 group-hover:visible group-hover:opacity-100 dark:bg-gray-600/80"
             >
@@ -170,8 +170,7 @@
             >
               <span class="inline-block overflow-hidden align-bottom">
                 <span
-                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
-                  style="animation-delay: 0s"
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0s]"
                 >
                   Discover,
                 </span>
@@ -179,8 +178,7 @@
 
               <span class="inline-block overflow-hidden align-bottom">
                 <span
-                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
-                  style="animation-delay: 0.05s"
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.05s]"
                 >
                   save,
                 </span>
@@ -188,8 +186,7 @@
 
               <span class="inline-block overflow-hidden align-bottom">
                 <span
-                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
-                  style="animation-delay: 0.1s"
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.1s]"
                 >
                   and
                 </span>
@@ -197,8 +194,7 @@
 
               <span class="inline-block overflow-hidden align-bottom">
                 <span
-                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both]"
-                  style="animation-delay: 0.15s"
+                  class="inline-block animate-[text-reveal_0.8s_cubic-bezier(0.77,0,0.175,1)_both] [animation-delay:0.15s]"
                 >
                   <span
                     class="animate-[shine_7s_linear_infinite] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.5)_15%,transparent_45%),linear-gradient(to_right,#eab308,#fde047)] bg-[length:200%_100%,100%_100%] bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(250,204,21,0.35)]"
@@ -367,6 +363,76 @@
             <div class="sentinel h-1"></div>
           </div>
         </main>
+        <!-- Confirmation Modal -->
+        <div
+          id="confirm-modal"
+          class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/40 p-4 backdrop-blur-sm dark:bg-black/60"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-modal-title"
+          aria-describedby="confirm-modal-description"
+        >
+          <div
+            class="border-dark-black/10 bg-light-cream/70 text-dark-black dark:bg-dark-black/20 dark:text-light-cream w-full max-w-md rounded-2xl border p-6 shadow-2xl backdrop-blur-xl transition-colors dark:border-white/10"
+          >
+            <!-- Icon -->
+            <div
+              class="bg-dark-orange/10 text-dark-orange mb-5 flex h-12 w-12 items-center justify-center rounded-xl"
+              aria-hidden="true"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 6h18" />
+                <path d="M8 6V4h8v2" />
+                <path d="m19 6-1 14H6L5 6" />
+                <path d="M10 11v5M14 11v5" />
+              </svg>
+            </div>
+
+            <!-- Message -->
+            <h2
+              id="confirm-modal-title"
+              class="mb-2 text-xl font-semibold tracking-tight"
+            >
+              Remove from watchlist?
+            </h2>
+
+            <p
+              id="confirm-modal-description"
+              class="mb-7 text-sm leading-6 opacity-70"
+            >
+              Are you sure you want to remove this from your watchlist?
+            </p>
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-3">
+              <button
+                id="confirm-cancel"
+                type="button"
+                class="border-dark-black/15 text-dark-black hover:bg-dark-black/5 focus-visible:outline-dark-orange dark:text-light-cream rounded-lg border px-4 py-2.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-white/15 dark:hover:bg-white/5"
+              >
+                Cancel
+              </button>
+
+              <button
+                id="confirm-remove"
+                type="button"
+                class="bg-dark-orange focus-visible:outline-dark-orange rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
         <!-- Toast -->
         <div
           class="toast fixed top-1/2 left-1/2 z-50 hidden -translate-x-1/2 -translate-y-1/2 [animation:border_4s_linear_infinite] rounded-xl border-2 border-transparent px-4 py-3 text-center text-sm text-zinc-900 shadow-lg [background:linear-gradient(white,white)_padding-box,conic-gradient(from_var(--border-angle),transparent_25%,var(--toast-color)_50%,transparent_75%)_border-box] dark:text-white dark:[background:linear-gradient(#18181b,#18181b)_padding-box,conic-gradient(from_var(--border-angle),transparent_25%,var(--toast-color)_50%,transparent_75%)_border-box]"
@@ -381,6 +447,6 @@
     </div>
 
     <!-- script -->
-    <script type="module" src="./js/controllers/controller.js"></script>
+    <script type="module" src="./js/controllers/mediaController.js"></script>
   </body>
 </html>

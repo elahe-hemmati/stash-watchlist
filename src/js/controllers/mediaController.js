@@ -1,13 +1,23 @@
+import initSharedController from "./sharedController.js";
 import * as model from "../models/mediaModel.js";
+import * as sharedModel from "../models/sharedModel.js";
+import * as watchlistModel from "../models/watchlistModel.js";
 import mediaView from "../views/mediaView.js";
-import sidebarView from "../views/sidebarView.js";
-import themeView from "../views/themeView.js";
+import confirmView from "../views/confirmView.js";
 import toastView from "../views/toastView.js";
 import { state } from "../state.js";
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 
 let searchController, paginationController;
+const prepareMediasForView = function (medias, filterType) {
+  const filteredMedias = sharedModel.filterMediasByType(medias, filterType);
+
+  return filteredMedias.map((media) => ({
+    ...media,
+    isAdded: watchlistModel.isInWatchlist(media),
+  }));
+};
 
 const loadNextPage = async function () {
   const nextPage = state.currentPage + 1;
@@ -24,16 +34,16 @@ const loadNextPage = async function () {
     if (queryAtStart !== state.currentQuery) return;
     state.currentPage = nextPage;
     const type = state.activeFilterType;
-    const filteredMedia = model.filterMediasByType(newMedias, type);
     state.medias = state.medias.concat(newMedias);
-    const hasAnyMatch = model.filterMediasByType(state.medias, type).length > 0;
-
+    const hasAnyMatch =
+      sharedModel.filterMediasByType(state.medias, type).length > 0;
     if (!hasAnyMatch && nextPage === state.totalPages) {
       mediaView.renderNoFilterResults(type);
       return;
     }
+    const medias = prepareMediasForView(newMedias, type);
     mediaView.appendMediaResults({
-      medias: filteredMedia,
+      medias,
       movieGenres: state.movieGenres,
       tvGenres: state.tvGenres,
     });
@@ -86,12 +96,10 @@ const getSearchMedias = async function () {
       signal,
     );
     if (queryAtStart !== state.currentQuery) return;
-
     if (data.results.length === 0) {
       mediaView.renderNoResults();
       return;
     }
-
     state.medias = await model.prepareSearchResults(data, signal);
     if (state.medias.length === 0) {
       mediaView.renderNoResults();
@@ -102,16 +110,13 @@ const getSearchMedias = async function () {
     state.tvGenres = await model.getMediaGenres("tv", signal);
     signal.throwIfAborted();
     state.totalPages = data.total_pages;
-    const filteredMedias = model.filterMediasByType(
-      state.medias,
-      state.activeFilterType,
-    );
-    if (filteredMedias.length === 0) {
+    const medias = prepareMediasForView(state.medias, state.activeFilterType);
+    if (medias.length === 0) {
       mediaView.renderNoFilterResults(state.activeFilterType);
       return;
     }
     mediaView.render({
-      medias: filteredMedias,
+      medias,
       movieGenres: state.movieGenres,
       tvGenres: state.tvGenres,
     });
@@ -130,11 +135,8 @@ const getSearchMedias = async function () {
 
 const filterMedia = function (filterType) {
   state.activeFilterType = filterType;
-  const filteredMedias = model.filterMediasByType(
-    state.medias,
-    state.activeFilterType,
-  );
-  if (filteredMedias.length === 0) {
+  const medias = prepareMediasForView(state.medias, state.activeFilterType);
+  if (medias.length === 0) {
     if (state.currentPage === state.totalPages) {
       mediaView.renderNoFilterResults(filterType);
     } else {
@@ -144,7 +146,7 @@ const filterMedia = function (filterType) {
     return;
   }
   mediaView.render({
-    medias: filteredMedias,
+    medias,
     movieGenres: state.movieGenres,
     tvGenres: state.tvGenres,
   });
@@ -162,30 +164,40 @@ const controlLoadMore = function () {
   }
 };
 
+const controlAddToWatchlist = async function (id, type) {
+  const media = state.medias.find(
+    (media) => media.id === Number(id) && media.type === type,
+  );
+  if (!media) return;
+  const isAlreadyAdded = watchlistModel.isInWatchlist(media);
+  if (isAlreadyAdded) {
+    const confirmed = await confirmView.confirm();
+    if (!confirmed) return;
+    watchlistModel.deleteFromWatchlist(id, type);
+    mediaView.updateWatchlistIcon(id, type, false);
+    toastView.showToast("Removed from your watchlist.", "success");
+    return;
+  }
+  const isAdded = watchlistModel.toggleWatchlist(media);
+  mediaView.updateWatchlistIcon(id, type, isAdded);
+  if (isAdded) {
+    toastView.showToast("Added to your watchlist.", "success");
+  }
+};
+
 const init = function () {
+  initSharedController();
+  watchlistModel.loadWatchlist();
   mediaView.addHandlerSearch(getSearchMedias);
   mediaView.addHandlerFilter(filterMedia);
   mediaView.addHandlerFilterHover();
   mediaView.addHandlerFilterLeave(() => mediaView.movePillToActiveFilter());
   mediaView.addHandlerLoadMore(controlLoadMore);
-  sidebarView.addHandlerNavOpen(() => {
-    sidebarView.asideOpenMobile();
-  });
-  sidebarView.addHandlerNavClose(() => {
-    sidebarView.asideCloseMobile();
-  });
-  sidebarView.addHandlerOverlay(() => {
-    sidebarView.asideCloseMobile();
-  });
-  sidebarView.addHandlerAsideToggle(() => {
-    state.isSidebarCollapsed = !state.isSidebarCollapsed;
-    sidebarView.asideToggle(state.isSidebarCollapsed);
-  });
-  themeView.addHandlerToggleTheme(() => {
-    themeView.toggleTheme();
-  });
   mediaView.initSearchInput();
   mediaView.initClearButton();
   state.activeFilterType = mediaView.getActiveFilterType();
+  mediaView.addHandlerAddToWatchlist(controlAddToWatchlist);
+  confirmView.addHandlerConfirm();
+  confirmView.addHandlerCancel();
 };
 init();

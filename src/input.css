@@ -107,15 +107,24 @@
   inherits: false;
   initial-value: 0deg;
 }
-.toast {
-  --toast-color: #ef4444;
-}
+
 @keyframes border {
   to {
     --border-angle: 360deg;
   }
 }
 
+@property --card-border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes card-border {
+  to {
+    --card-border-angle: 360deg;
+  }
+}
 /* load more */
 
 /* @keyframes left-card {

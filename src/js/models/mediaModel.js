@@ -1,4 +1,5 @@
 import { TOKEN, BASE_URL } from "../config.js";
+import { state } from "../state.js";
 
 const options = {
   method: "GET",
@@ -92,15 +93,4 @@ const enrichMediaDetails = async function (medias, signal) {
 export const prepareSearchResults = async function (data, signal) {
   const pageMedias = preparePageMedias(data);
   return await enrichMediaDetails(pageMedias, signal);
-};
-
-export const filterMediasByType = function (medias, type) {
-  let filteredMedia = medias;
-  if (type === "movie") {
-    filteredMedia = medias.filter((media) => media.type === "movie");
-  }
-  if (type === "tv") {
-    filteredMedia = medias.filter((media) => media.type === "tv");
-  }
-  return filteredMedia;
 };

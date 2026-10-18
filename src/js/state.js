@@ -8,4 +8,6 @@ export const state = {
   movieGenres: [],
   tvGenres: [],
   activeFilterType: null,
+  watchlist: [],
+  activeSort: "added",
 };
