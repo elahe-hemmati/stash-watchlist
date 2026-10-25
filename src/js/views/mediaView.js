@@ -110,17 +110,15 @@ class MediaView extends View {
       handler(id, type);
     });
   }
-  // ****************
-
-  // *******watchlist icon
-  updateWatchlistIcon(id, type, isAdded) {
-    const btn = this._parentElement.querySelector(
-      `.add-to-watchlist-btn[data-id="${id}"][data-type="${type}"]`,
-    );
-    if (!btn) return;
-    const img = btn.querySelector("img");
-    if (!img) return;
-    img.src = isAdded ? assets.bookmarkFilled : assets.bookmark;
+  addHandlerGoToDetails(handler) {
+    this._parentElement.addEventListener("click", (e) => {
+      const card = e.target.closest(".media-card");
+      const btn = e.target.closest(".add-to-watchlist-btn");
+      if (btn) return;
+      if (!card) return;
+      const { id, type } = card.dataset;
+      handler(id, type);
+    });
   }
   // ****************
 

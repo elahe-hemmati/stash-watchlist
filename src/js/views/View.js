@@ -94,6 +94,23 @@ export default class View {
     this._mediaFilters.classList.remove("invisible");
   }
 
+  updateWatchlistIcon(id, type, isAdded) {
+    const btn = this._parentElement.querySelector(
+      `.add-to-watchlist-btn[data-id="${id}"][data-type="${type}"]`,
+    );
+
+    if (!btn) return;
+
+    const img = btn.querySelector("img");
+    if (!img) return;
+
+    img.src = isAdded ? assets.bookmarkFilled : assets.bookmark;
+    const text = btn.querySelector("span");
+
+    if (text) {
+      text.textContent = isAdded ? "Remove from Watchlist" : "Add to Watchlist";
+    }
+  }
   // **********Filter events
   _handleFilterHover(e) {
     const button = e.target.closest(".media-filter");
@@ -120,8 +137,4 @@ export default class View {
   addHandlerFilterLeave(handler) {
     this._mediaFilters.addEventListener("mouseleave", handler);
   }
-  // update() {}
-  // renderSpinner() {}
-  // renderError() {}
-  // renderMessage() {}
 }

@@ -125,6 +125,102 @@
     --card-border-angle: 360deg;
   }
 }
+
+/* Cast */
+.cast-stack {
+  --cast-size: 4rem;
+  --cast-overlap: 1.65rem;
+
+  padding-top: 0.5rem;
+}
+
+.cast-item {
+  anchor-scope: --cast;
+  anchor-name: none;
+
+  width: var(--cast-size);
+  flex: 0 0 var(--cast-size);
+  margin-right: calc(var(--cast-overlap) * -1);
+  z-index: 1;
+
+  transition:
+    margin 450ms cubic-bezier(0.22, 1, 0.36, 1),
+    z-index 0ms;
+}
+
+.cast-circle {
+  anchor-name: --cast;
+
+  width: var(--cast-size);
+  height: var(--cast-size);
+  overflow: hidden;
+  border-radius: 9999px;
+  transform: skewX(-9deg) scale(0.96);
+  box-shadow: 0 5px 18px rgb(0 0 0 / 12%);
+
+  transition:
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 450ms ease;
+}
+
+.cast-circle img {
+  transform: skewX(9deg) scale(1.12);
+  transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.dark .cast-circle img {
+  filter: sepia(18%) brightness(0.88) saturate(0.9);
+}
+.cast-info {
+  position: fixed;
+  position-anchor: --cast;
+  position-area: block-end center;
+  position-try-fallbacks: flip-block;
+  margin-block: 0.75rem;
+}
+
+.cast-item:hover,
+.cast-item:focus-within {
+  z-index: 20;
+  margin-right: 1.75rem;
+}
+
+.cast-item:hover .cast-circle,
+.cast-item:focus-within .cast-circle {
+  transform: skewX(0) scale(1.06);
+  box-shadow: 0 10px 28px rgb(0 0 0 / 22%);
+}
+
+.cast-item:hover .cast-circle img,
+.cast-item:focus-within .cast-circle img {
+  transform: skewX(0) scale(1);
+}
+
+.cast-item:hover .cast-info,
+.cast-item:focus-within .cast-info {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 640px) {
+  .cast-stack {
+    --cast-size: 3rem;
+    --cast-overlap: 1.25rem;
+  }
+
+  .cast-item:hover,
+  .cast-item:focus-within {
+    margin-right: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cast-item,
+  .cast-circle,
+  .cast-circle img {
+    transition: none;
+  }
+}
+
 /* load more */
 
 /* @keyframes left-card {

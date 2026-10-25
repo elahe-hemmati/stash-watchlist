@@ -1,31 +1,4 @@
-import { TOKEN, BASE_URL } from "../config.js";
-import { state } from "../state.js";
-
-const options = {
-  method: "GET",
-  headers: {
-    accept: "application/json",
-    Authorization: `Bearer ${TOKEN}`,
-  },
-};
-
-export const request = async function (endpoint, signal) {
-  try {
-    const res = await fetch(`${BASE_URL}${endpoint}`, {
-      ...options,
-      signal,
-    });
-    const data = await res.json();
-    if (!res.ok)
-      throw new Error(
-        `${data.status_message} Error, http status code ${res.status}`,
-      );
-
-    return data;
-  } catch (err) {
-    throw err;
-  }
-};
+import * as sharedModel from "./sharedModel.js";
 
 export const prepareMediaData = function (media) {
   return {
@@ -46,14 +19,14 @@ export const prepareMediaData = function (media) {
 
 export const getMediaDetails = async function (id, type, signal) {
   return type === "movie"
-    ? await request(`movie/${id}`, signal)
-    : await request(`tv/${id}`, signal);
+    ? await sharedModel.request(`movie/${id}`, signal)
+    : await sharedModel.request(`tv/${id}`, signal);
 };
 
 export const getMediaGenres = async function (type, signal) {
   return type === "movie"
-    ? await request("genre/movie/list", signal)
-    : await request("genre/tv/list", signal);
+    ? await sharedModel.request("genre/movie/list", signal)
+    : await sharedModel.request("genre/tv/list", signal);
 };
 
 const preparePageMedias = function (data) {

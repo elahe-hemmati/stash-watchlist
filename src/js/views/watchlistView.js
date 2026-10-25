@@ -147,6 +147,18 @@ class WatchlistView extends View {
       handler();
     });
   }
+
+  addHandlerGoToDetails(handler) {
+    this._parentElement.addEventListener("click", (e) => {
+      const card = e.target.closest(".watchlist-card");
+      const btnRemove = e.target.closest(".remove-from-watchlist-btn");
+      const btnToggle = e.target.closest(".toggle-watched-btn");
+      if (btnRemove || btnToggle) return;
+      if (!card) return;
+      const { id, type } = card.dataset;
+      handler(id, type);
+    });
+  }
   // ******************
   _generateMarkup() {
     return this._data
