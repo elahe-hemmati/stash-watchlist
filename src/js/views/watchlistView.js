@@ -11,6 +11,11 @@ class WatchlistView extends View {
   _clearSearchButton = document.querySelector(".btn-clear");
   _watchlistToolbar = document.querySelector("#watchlist-toolbar");
 
+  constructor() {
+    super();
+    this._addHandlerCardKeyboard(".watchlist-card");
+  }
+
   render(data) {
     super.render(data);
     if (data.length === 0) {

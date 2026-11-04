@@ -30,3 +30,15 @@ export const prepareDetailsResults = function (data, credits, type) {
     watched: false,
   };
 };
+
+export const prepareSimilarResults = function (results, type) {
+  return results.map((media) => ({
+    id: media.id,
+    type,
+    poster: media.poster_path,
+    title: type === "movie" ? media.title : media.name,
+    year: type === "movie" ? media.release_date : media.first_air_date,
+    rating: media.vote_average,
+    isAdded: false,
+  }));
+};

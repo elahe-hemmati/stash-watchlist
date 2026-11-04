@@ -19,6 +19,11 @@ class MediaView extends View {
   _activeFilter = document.querySelector(".media-filter");
   _observer;
 
+  constructor() {
+    super();
+    this._addHandlerCardKeyboard(".media-card");
+  }
+
   // ************rendering:
   render(data) {
     super.render(data);

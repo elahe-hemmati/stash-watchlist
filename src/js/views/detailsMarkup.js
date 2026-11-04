@@ -93,6 +93,7 @@ class DetailsMarkup extends posterView {
       data.directors?.length ||
       data.writers?.length,
     );
+
     return `
     <section class="border-dark-black/10 bg-light-cream/50 dark:border-light-cream/10 dark:bg-dark-black/40 relative isolate w-full overflow-hidden rounded-3xl border">
        <!-- Backdrop -->
@@ -296,6 +297,154 @@ class DetailsMarkup extends posterView {
             </div>
         </div>
     </section>`;
+  }
+
+  createSimilarMediaMarkup(similar, type) {
+    return ` 
+    <section class="mt-16 w-full">
+      <div class="mb-6 flex items-center justify-between gap-4">
+        <div>
+          <p
+            class="mb-1 text-xs font-semibold tracking-[0.2em] text-amber-600 uppercase dark:text-amber-400"
+          >
+            More to explore
+          </p>
+          <h2 class="text-2xl font-bold sm:text-3xl">Similar ${type === "movie" ? "Movies" : "TV Shows"}</h2>
+        </div>
+      </div>
+      <section class="relative">
+        <button
+          id="prev"
+          class="absolute top-1/2 -left-4 z-10 -translate-y-1/2 rounded-full bg-amber-400 p-3 text-black"
+        >
+          ←
+        </button>
+
+      <div class="carousel overflow-hidden" tabindex="0">
+      <div id="track"
+            class="carousel-track flex flex-nowrap gap-4 transition-transform duration-500">  
+      ${similar.map((sim) => this.createSimilarMediaCard(sim)).join("")}
+      </div>
+      </div>
+      <button
+          id="next"
+          class="absolute top-1/2 -right-4 z-10 -translate-y-1/2 rounded-full bg-amber-400 p-3 text-black"
+        >
+          →
+        </button>
+      </section>
+    </section>`;
+  }
+
+  createSimilarMediaCard(media) {
+    const title = helper.escapeHTML(media.title);
+    const posterUrl = media.poster ? helper.getPosterUrl(media.poster) : "";
+    const detailsUrl = `./details.html?id=${media.id}&type=${media.type}`;
+    const isAdded = Boolean(media.isAdded);
+    const hasPoster = Boolean(media.poster);
+
+    return `
+    <article class="carousel-slide shrink-0 basis-[55%] md:basis-[calc((100%-3rem)/4)] lg:basis-[calc((100%-4rem)/5)]">
+      <div
+        class="media-card-wrapper relative rounded-xl border-2 border-transparent p-[1px]
+        hover:[animation:border_2.5s_linear_infinite]
+        hover:[background:linear-gradient(white,white)_padding-box,conic-gradient(from_var(--border-angle),transparent_25%,#f59e0b_50%,transparent_75%)_border-box]
+        dark:hover:[background:linear-gradient(#18181b,#18181b)_padding-box,conic-gradient(from_var(--border-angle),transparent_25%,#f59e0b_50%,transparent_75%)_border-box]"
+      >
+        <div
+          class="media-card relative w-full overflow-hidden rounded-xl
+          shadow-[0_8px_20px_rgba(0,0,0,0.3)]
+          dark:shadow-[0_0_20px_rgba(255,255,255,0.15)]"
+          data-id="${media.id}"
+          data-type="${media.type}"
+        >
+          <span
+            class="absolute top-2 left-2 z-10 rounded-md px-2 py-1
+            text-[10px] font-semibold tracking-wide text-white
+            ${media.type === "movie" ? "bg-amber-300/80" : "bg-orange-500/80"}"
+          >
+            ${media.type === "movie" ? "MOVIE" : "TV SHOW"}
+          </span>
+
+          <button
+            type="button"
+            class="add-to-watchlist-btn group absolute top-2 right-2 z-20
+            flex h-9 w-9 items-center justify-center rounded-full
+            border border-white/20 bg-black/40 text-white shadow-lg
+            backdrop-blur-md transition-all duration-300
+            hover:scale-110 hover:border-amber-300/50 hover:bg-black/60
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/70"
+            id="add-to-watchlist-${media.id}-${media.type}"
+            aria-label="${isAdded ? "Remove from" : "Add to"} watchlist"
+            title="${isAdded ? "Remove from" : "Add to"} Watchlist"
+            data-id="${media.id}"
+            data-type="${media.type}"
+          >
+            <img
+              src="${isAdded ? assets.bookmarkFilled : assets.bookmark}"
+              alt=""
+              class="h-5 w-5 transition-transform duration-300"
+            />
+          </button>
+
+          <div
+            class="poster-wrapper relative aspect-[2/3] w-full
+            bg-[radial-gradient(circle_at_center,rgba(234,179,8,0.18),transparent_55%),linear-gradient(145deg,#18181b,#09090b)]
+            ${hasPoster ? "animate-pulse" : ""}"
+          >
+            <div
+              class="poster-error ${hasPoster ? "hidden" : ""} absolute inset-0
+              flex items-center justify-center"
+            >
+              <img src="${assets.imageError}" alt="" class="h-6 w-6" />
+            </div>
+
+            ${
+              hasPoster
+                ? `
+                  <img
+                    src="${posterUrl}"
+                    alt="${title}"
+                    loading="lazy"
+                    width="500"
+                    height="750"
+                    decoding="async"
+                    class="media-poster h-full w-full object-cover opacity-0
+                    transition-opacity duration-300"
+                  />
+                `
+                : ""
+            }
+          </div>
+
+          <a
+            href="${detailsUrl}"
+            class="absolute inset-0 z-0"
+            aria-label="View ${title} details"
+          ></a>
+
+          <div
+            class="pointer-events-none absolute inset-0
+            bg-gradient-to-t from-black/95 via-black/20 to-transparent"
+          ></div>
+
+          <div class="pointer-events-none absolute inset-x-0 bottom-0 p-3 text-white sm:p-4">
+            <div class="mb-1 flex items-center gap-1.5 text-xs">
+              <span class="text-amber-400">★</span>
+              <span class="font-semibold">${media.rating?.toFixed(1) ?? "N/A"}</span>
+              <span class="text-white/60">
+                · ${media.year?.slice(0, 4) ?? "N/A"}
+              </span>
+            </div>
+
+            <h3 class="line-clamp-2 text-sm leading-snug font-semibold sm:text-base">
+              ${title}
+            </h3>
+          </div>
+        </div>
+      </div>
+    </article>
+  `;
   }
 }
 export default new DetailsMarkup();
