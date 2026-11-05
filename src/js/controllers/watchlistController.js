@@ -1,4 +1,6 @@
-import initSharedController from "./sharedController.js";
+import initSharedController, {
+  controlGoToDetails,
+} from "./sharedController.js";
 import * as sharedModel from "../models/sharedModel.js";
 import * as watchlistModel from "../models/watchlistModel.js";
 import watchlistView from "../views/watchlistView.js";
@@ -55,7 +57,6 @@ const controlSortWatchlist = function (sortType) {
 const getSearchWatchlist = function () {
   const query = watchlistView.getSearchQuery();
   state.currentQuery = query;
-  watchlistModel.searchWatchlist(query);
   controlFilterWatchlist(watchlistView.getActiveFilterType());
 };
 
@@ -81,8 +82,14 @@ const init = function () {
   watchlistView.addHandlerSearch(getSearchWatchlist);
   watchlistView.initSearchInput();
   watchlistView.addHandlerClearSearch(getSearchWatchlist);
+  watchlistView.addHandlerGoToDetails(controlGoToDetails);
   confirmView.addHandlerConfirm();
   confirmView.addHandlerCancel();
 };
 
 init();
+
+window.addEventListener("pageshow", function () {
+  watchlistModel.loadWatchlist();
+  controlFilterWatchlist(watchlistView.getActiveFilterType());
+});

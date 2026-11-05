@@ -1,5 +1,8 @@
-import initSharedController from "./sharedController.js";
-import * as model from "../models/mediaModel.js";
+import initSharedController, {
+  handleWatchlistToggle,
+  controlGoToDetails,
+} from "./sharedController.js";
+import * as mediaModel from "../models/mediaModel.js";
 import * as sharedModel from "../models/sharedModel.js";
 import * as watchlistModel from "../models/watchlistModel.js";
 import mediaView from "../views/mediaView.js";
@@ -26,11 +29,11 @@ const loadNextPage = async function () {
   paginationController = new AbortController();
   const { signal } = paginationController;
   try {
-    const data = await model.request(
+    const data = await sharedModel.request(
       `search/multi?query=${encodeURIComponent(state.currentQuery)}&page=${nextPage}`,
       signal,
     );
-    const newMedias = await model.prepareSearchResults(data, signal);
+    const newMedias = await mediaModel.prepareSearchResults(data, signal);
     if (queryAtStart !== state.currentQuery) return;
     state.currentPage = nextPage;
     const type = state.activeFilterType;
@@ -91,7 +94,7 @@ const getSearchMedias = async function () {
     const encodedQuery = encodeURIComponent(query);
     mediaView.hideMediaFilters();
     mediaView.renderSpinner();
-    const data = await model.request(
+    const data = await sharedModel.request(
       `search/multi?query=${encodedQuery}&page=${state.currentPage}`,
       signal,
     );
@@ -100,14 +103,14 @@ const getSearchMedias = async function () {
       mediaView.renderNoResults();
       return;
     }
-    state.medias = await model.prepareSearchResults(data, signal);
+    state.medias = await mediaModel.prepareSearchResults(data, signal);
     if (state.medias.length === 0) {
       mediaView.renderNoResults();
       return;
     }
-    state.movieGenres = await model.getMediaGenres("movie", signal);
+    state.movieGenres = await mediaModel.getMediaGenres("movie", signal);
     signal.throwIfAborted();
-    state.tvGenres = await model.getMediaGenres("tv", signal);
+    state.tvGenres = await mediaModel.getMediaGenres("tv", signal);
     signal.throwIfAborted();
     state.totalPages = data.total_pages;
     const medias = prepareMediasForView(state.medias, state.activeFilterType);
@@ -164,30 +167,17 @@ const controlLoadMore = function () {
   }
 };
 
-const controlAddToWatchlist = async function (id, type) {
+const controlAddToWatchlist = function (id, type) {
   const media = state.medias.find(
     (media) => media.id === Number(id) && media.type === type,
   );
   if (!media) return;
-  const isAlreadyAdded = watchlistModel.isInWatchlist(media);
-  if (isAlreadyAdded) {
-    const confirmed = await confirmView.confirm();
-    if (!confirmed) return;
-    watchlistModel.deleteFromWatchlist(id, type);
-    mediaView.updateWatchlistIcon(id, type, false);
-    toastView.showToast("Removed from your watchlist.", "success");
-    return;
-  }
-  const isAdded = watchlistModel.toggleWatchlist(media);
-  mediaView.updateWatchlistIcon(id, type, isAdded);
-  if (isAdded) {
-    toastView.showToast("Added to your watchlist.", "success");
-  }
+  handleWatchlistToggle(media, mediaView);
 };
 
 const init = function () {
   initSharedController();
-  watchlistModel.loadWatchlist();
+
   mediaView.addHandlerSearch(getSearchMedias);
   mediaView.addHandlerFilter(filterMedia);
   mediaView.addHandlerFilterHover();
@@ -199,5 +189,14 @@ const init = function () {
   mediaView.addHandlerAddToWatchlist(controlAddToWatchlist);
   confirmView.addHandlerConfirm();
   confirmView.addHandlerCancel();
+  mediaView.addHandlerGoToDetails(controlGoToDetails);
 };
 init();
+
+window.addEventListener("pageshow", function () {
+  watchlistModel.loadWatchlist();
+  state.medias.forEach((media) => {
+    const isAdded = watchlistModel.isInWatchlist(media);
+    mediaView.updateWatchlistIcon(media.id, media.type, isAdded);
+  });
+});

@@ -11,6 +11,11 @@ class WatchlistView extends View {
   _clearSearchButton = document.querySelector(".btn-clear");
   _watchlistToolbar = document.querySelector("#watchlist-toolbar");
 
+  constructor() {
+    super();
+    this._addHandlerCardKeyboard(".watchlist-card");
+  }
+
   render(data) {
     super.render(data);
     if (data.length === 0) {
@@ -145,6 +150,18 @@ class WatchlistView extends View {
     this._clearSearchButton.addEventListener("click", () => {
       this.clearSearchInput();
       handler();
+    });
+  }
+
+  addHandlerGoToDetails(handler) {
+    this._parentElement.addEventListener("click", (e) => {
+      const card = e.target.closest(".watchlist-card");
+      const btnRemove = e.target.closest(".remove-from-watchlist-btn");
+      const btnToggle = e.target.closest(".toggle-watched-btn");
+      if (btnRemove || btnToggle) return;
+      if (!card) return;
+      const { id, type } = card.dataset;
+      handler(id, type);
     });
   }
   // ******************

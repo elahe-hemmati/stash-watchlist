@@ -94,6 +94,24 @@ export default class View {
     this._mediaFilters.classList.remove("invisible");
   }
 
+  updateWatchlistIcon(id, type, isAdded) {
+    const containers = [
+      this._parentElement,
+      document.querySelector(".similar-container"),
+    ];
+
+    for (const container of containers) {
+      const buttons = container?.querySelectorAll(
+        `.add-to-watchlist-btn[data-id="${id}"][data-type="${type}"]`,
+      );
+
+      buttons?.forEach((btn) => {
+        const img = btn.querySelector("img");
+        if (img) img.src = isAdded ? assets.bookmarkFilled : assets.bookmark;
+      });
+    }
+  }
+
   // **********Filter events
   _handleFilterHover(e) {
     const button = e.target.closest(".media-filter");
@@ -120,8 +138,15 @@ export default class View {
   addHandlerFilterLeave(handler) {
     this._mediaFilters.addEventListener("mouseleave", handler);
   }
-  // update() {}
-  // renderSpinner() {}
-  // renderError() {}
-  // renderMessage() {}
+
+  _addHandlerCardKeyboard(...selectors) {
+    this._parentElement.addEventListener("keydown", (e) => {
+      const card = e.target.closest(selectors.join(", "));
+
+      if (!card || e.target !== card) return;
+      if (e.key !== "Enter") return;
+
+      card.click();
+    });
+  }
 }

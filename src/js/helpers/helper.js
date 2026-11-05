@@ -67,3 +67,28 @@ export const getBackdropUrl = function (backdropPath) {
     ? `https://image.tmdb.org/t/p/w500${backdropPath}`
     : assets.imageError;
 };
+
+export const getProfileUrl = function (profilePath) {
+  return profilePath
+    ? `https://image.tmdb.org/t/p/w185${profilePath}`
+    : assets.imageError;
+};
+
+export const formatDate = function (date) {
+  if (!date) return null;
+
+  return new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+export const getLanguageName = function (languageCode) {
+  if (!languageCode) return "";
+
+  return (
+    new Intl.DisplayNames(["en"], { type: "language" }).of(languageCode) ||
+    languageCode
+  );
+};
