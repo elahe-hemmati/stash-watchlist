@@ -11,8 +11,9 @@ import toastView from "../views/toastView.js";
 import { state } from "../state.js";
 import "core-js/stable";
 import "regenerator-runtime/runtime";
+import mediaCarouselView from "../views/mediaCarouselView.js";
 
-let searchController, paginationController;
+let searchController, paginationController, trendingController;
 const prepareMediasForView = function (medias, filterType) {
   const filteredMedias = sharedModel.filterMediasByType(medias, filterType);
 
@@ -91,6 +92,7 @@ const getSearchMedias = async function () {
       toastView.showToast("Please enter a media name.", "warning");
       return;
     }
+    mediaCarouselView.hide();
     const encodedQuery = encodeURIComponent(query);
     mediaView.hideMediaFilters();
     mediaView.renderSpinner();
@@ -118,6 +120,7 @@ const getSearchMedias = async function () {
       mediaView.renderNoFilterResults(state.activeFilterType);
       return;
     }
+
     mediaView.render({
       medias,
       movieGenres: state.movieGenres,
@@ -175,16 +178,56 @@ const controlAddToWatchlist = function (id, type) {
   handleWatchlistToggle(media, mediaView);
 };
 
+const getTrendingMedias = async function () {
+  try {
+    trendingController?.abort();
+    trendingController = new AbortController();
+
+    const { signal } = trendingController;
+
+    const data = await sharedModel.request("trending/all/week", signal);
+    const medias = await mediaModel.getTrendingMedias(data, signal);
+
+    if (signal.aborted) return;
+
+    const movieGenres = await mediaModel.getMediaGenres("movie", signal);
+    const tvGenres = await mediaModel.getMediaGenres("tv", signal);
+
+    if (signal.aborted) return;
+
+    mediaCarouselView.renderTrendingCards(medias, movieGenres, tvGenres);
+    mediaCarouselView.renderCarousel();
+    mediaCarouselView.startAutoPlay();
+  } catch (err) {
+    if (err.name === "AbortError") return;
+
+    console.error(err);
+    toastView.showToast(
+      "Unable to connect to the media service. Please check your internet connection or VPN.",
+      "error",
+    );
+  }
+};
+
 const init = function () {
   initSharedController();
-
+  mediaCarouselView.renderSkeleton();
+  getTrendingMedias();
+  mediaCarouselView.addHandlerNext();
+  mediaCarouselView.addHandlerPrev();
+  mediaCarouselView.addHandlerTouch();
+  mediaCarouselView._addHandlerKeyboard();
+  mediaCarouselView.addHandlerGoToDetails(controlGoToDetails);
   mediaView.addHandlerSearch(getSearchMedias);
   mediaView.addHandlerFilter(filterMedia);
   mediaView.addHandlerFilterHover();
   mediaView.addHandlerFilterLeave(() => mediaView.movePillToActiveFilter());
   mediaView.addHandlerLoadMore(controlLoadMore);
   mediaView.initSearchInput();
-  mediaView.initClearButton();
+  mediaView.initClearButton(() => {
+    mediaView.clearSearchResults();
+    mediaCarouselView.show();
+  });
   state.activeFilterType = mediaView.getActiveFilterType();
   mediaView.addHandlerAddToWatchlist(controlAddToWatchlist);
   confirmView.addHandlerConfirm();

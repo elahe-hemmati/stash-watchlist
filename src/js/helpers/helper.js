@@ -64,7 +64,7 @@ export const getPosterUrl = (posterPath) => {
 
 export const getBackdropUrl = function (backdropPath) {
   return backdropPath
-    ? `https://image.tmdb.org/t/p/w500${backdropPath}`
+    ? `https://image.tmdb.org/t/p/w1280${backdropPath}`
     : assets.imageError;
 };
 

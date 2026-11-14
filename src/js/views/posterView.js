@@ -1,13 +1,17 @@
-export default class PosterView {
+import View from "./View.js";
+
+export default class PosterView extends View {
   _showPoster(poster) {
     poster.classList.remove("opacity-0");
-    poster.parentElement.classList.remove("animate-pulse");
+    poster.closest(".poster-wrapper").classList.remove("animate-pulse");
   }
 
   _showPosterError(poster) {
-    const posterError = poster.parentElement.querySelector(".poster-error");
+    const posterError = poster
+      .closest(".poster-wrapper")
+      .querySelector(".poster-error");
     posterError.classList.remove("hidden");
-    poster.parentElement.classList.remove("animate-pulse");
+    poster.closest(".poster-wrapper").classList.remove("animate-pulse");
   }
 
   setupPosterEvents(newMediaCards) {
