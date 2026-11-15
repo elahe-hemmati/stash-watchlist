@@ -13,6 +13,7 @@ export const prepareMediaData = function (media) {
     rating: media.vote_average,
     genres: media.genre_ids,
     runtime: media.runtime,
+    language: media.original_language,
     watched: false,
   };
 };
@@ -64,6 +65,11 @@ const enrichMediaDetails = async function (medias, signal) {
 };
 
 export const prepareSearchResults = async function (data, signal) {
+  const pageMedias = preparePageMedias(data);
+  return await enrichMediaDetails(pageMedias, signal);
+};
+
+export const getTrendingMedias = async function (data, signal) {
   const pageMedias = preparePageMedias(data);
   return await enrichMediaDetails(pageMedias, signal);
 };

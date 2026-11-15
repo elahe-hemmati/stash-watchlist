@@ -313,25 +313,26 @@ class DetailsMarkup extends posterView {
         </div>
       </div>
       <section class="relative">
-        <button
-          id="prev"
-          class="absolute top-1/2 -left-4 z-10 -translate-y-1/2 rounded-full bg-amber-400 p-3 text-black"
-        >
-          ←
-        </button>
-
+      <button
+      id="prev"
+      type="button"
+      aria-label="Prev movie"
+      class="absolute top-1/2 left-[2%] z-50 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-white/25 text-white backdrop-blur transition hover:bg-white/40 sm:size-16">
+      <img src="${assets.arrowLeft}" alt="" class="h-5 w-5" />
+      </button>
       <div class="carousel overflow-hidden" tabindex="0">
       <div id="track"
             class="carousel-track flex flex-nowrap gap-4 transition-transform duration-500">  
       ${similar.map((sim) => this.createSimilarMediaCard(sim)).join("")}
       </div>
       </div>
-      <button
-          id="next"
-          class="absolute top-1/2 -right-4 z-10 -translate-y-1/2 rounded-full bg-amber-400 p-3 text-black"
-        >
-          →
-        </button>
+       <button 
+       id="next"
+       type="button"
+       aria-label="Next movie"
+       class="absolute top-1/2 right-[2%] z-50 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-white/25 text-white backdrop-blur transition hover:bg-white/40 sm:size-16">
+          <img src="${assets.arrowRight}" alt="" class="h-5 w-5" />
+       </button>
       </section>
     </section>`;
   }

@@ -30,3 +30,11 @@ export const deleteIcon = new URL(
   "../../img/icons/delete.svg",
   import.meta.url,
 );
+export const arrowLeft = new URL(
+  "../../img/icons/arrow-left.svg",
+  import.meta.url,
+);
+export const arrowRight = new URL(
+  "../../img/icons/arrow-right.svg",
+  import.meta.url,
+);

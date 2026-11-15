@@ -47,9 +47,10 @@ export default class View {
     });
   }
 
-  initClearButton() {
+  initClearButton(handler) {
     this._clearSearchButton.addEventListener("click", () => {
       this.clearSearchInput();
+      handler();
     });
   }
 
@@ -110,6 +111,24 @@ export default class View {
         if (img) img.src = isAdded ? assets.bookmarkFilled : assets.bookmark;
       });
     }
+  }
+  // ********carousel
+  _cloneLastSlides(slides, cloneCount, track) {
+    const lastSlides = [...slides].slice(-cloneCount);
+
+    const clonedSlides = lastSlides.map((slide) => slide.cloneNode(true));
+
+    clonedSlides.reverse().forEach((slide) => track.prepend(slide));
+    return clonedSlides;
+  }
+
+  _cloneSlides(slides, cloneCount, track) {
+    const firstSlides = [...slides].slice(0, cloneCount);
+
+    const clonedSlides = firstSlides.map((slide) => slide.cloneNode(true));
+
+    clonedSlides.forEach((slide) => track.append(slide));
+    return clonedSlides;
   }
 
   // **********Filter events

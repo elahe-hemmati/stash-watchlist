@@ -17,8 +17,18 @@ class DetailsCarouselView extends View {
 
     this._updateDimensions();
 
-    this._cloneLastSlides();
-    this._cloneSlides();
+    const clonedLastSlides = this._cloneLastSlides(
+      this._slides,
+      this._cloneCount,
+      this._track,
+    );
+    const clonedSlides = this._cloneSlides(
+      this._slides,
+      this._cloneCount,
+      this._track,
+    );
+    detailsMarkup.setupPosterEvents(clonedLastSlides);
+    detailsMarkup.setupPosterEvents(clonedSlides);
 
     this._goToSlide(this._currentIndex);
 
@@ -31,30 +41,6 @@ class DetailsCarouselView extends View {
       this._updateDimensions();
       this._goToSlide(this._currentIndex);
     });
-  }
-
-  _cloneLastSlides() {
-    this._lastSlides = [...this._slides].slice(-this._cloneCount);
-
-    const clonedLastSlides = this._lastSlides.map((slide) =>
-      slide.cloneNode(true),
-    );
-
-    detailsMarkup.setupPosterEvents(clonedLastSlides);
-
-    clonedLastSlides.reverse().forEach((slide) => this._track.prepend(slide));
-  }
-
-  _cloneSlides() {
-    this._firstSlides = [...this._slides].slice(0, this._cloneCount);
-
-    const clonedSlides = this._firstSlides.map((slide) =>
-      slide.cloneNode(true),
-    );
-
-    detailsMarkup.setupPosterEvents(clonedSlides);
-
-    clonedSlides.forEach((slide) => this._track.append(slide));
   }
 
   _goToSlide(index) {

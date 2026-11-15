@@ -335,10 +335,66 @@
                 TV Shows
               </button>
             </div>
-            <!-- Search Results Container -->
-            <div
-              class="search-results-container grid grid-cols-1 gap-4 p-3 min-[411px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-            ></div>
+
+            <!-- Discovery Content -->
+            <div class="discovery-content w-full">
+              <!-- Discovery Carousel -->
+              <section
+                class="discovery-carousel-section mb-10 w-full"
+                aria-label="Recommended movies"
+              >
+                <div class="mb-6 text-center">
+                  <p
+                    class="mb-1 text-xs font-semibold tracking-[0.2em] text-amber-500 uppercase sm:text-xs"
+                  >
+                    Handpicked for you
+                  </p>
+
+                  <h2 class="text-xl font-bold sm:text-3xl">
+                    Recommended Movies
+                  </h2>
+                </div>
+
+                <div
+                  id="carousel"
+                  class="relative mx-auto h-[280px] w-full max-w-5xl overflow-hidden [perspective:1200px] sm:h-[340px] lg:h-[400px]"
+                  role="region"
+                  aria-roledescription="carousel"
+                >
+                  <button
+                    id="prev"
+                    type="button"
+                    aria-label="Next movie"
+                    class="absolute top-1/2 left-[2%] z-50 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-white/25 text-white backdrop-blur transition hover:bg-white/40 sm:size-16"
+                  >
+                    <img
+                      src="./img/icons/arrow-left.svg"
+                      alt=""
+                      class="h-5 w-5"
+                    />
+                  </button>
+                  <div class="discovery-carousel-track absolute inset-0"></div>
+                  <!-- Next Button -->
+                  <button
+                    id="next"
+                    type="button"
+                    aria-label="Next movie"
+                    class="absolute top-1/2 right-[2%] z-50 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-white/25 text-white backdrop-blur transition hover:bg-white/40 sm:size-16"
+                  >
+                    <img
+                      src="./img/icons/arrow-right.svg"
+                      alt=""
+                      class="h-5 w-5"
+                    />
+                  </button>
+                </div>
+              </section>
+
+              <!-- Search Results Container -->
+              <div
+                class="search-results-container grid grid-cols-1 gap-4 p-3 min-[411px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+              ></div>
+            </div>
             <!-- Sentinel -->
             <div class="pagination-loader hidden min-h-[200px]"></div>
             <div class="sentinel h-1"></div>
