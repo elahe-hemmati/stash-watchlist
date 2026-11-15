@@ -96,10 +96,6 @@ class mediaCarouselView extends posterView {
   }
 
   trendingCards(media, genres) {
-    console.log({
-      poster: media.poster,
-      backdrop: media.backdrop,
-    });
     const genre = this._getGenre(media, genres);
     const runtime = helper.formatRuntime(media);
 

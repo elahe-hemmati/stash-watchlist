@@ -90,6 +90,7 @@ const getSearchMedias = async function () {
       mediaView.clearSearchResults();
       mediaView.hidePaginationLoader();
       toastView.showToast("Please enter a media name.", "warning");
+      mediaCarouselView.show();
       return;
     }
     mediaCarouselView.hide();
@@ -225,6 +226,12 @@ const init = function () {
   mediaView.addHandlerLoadMore(controlLoadMore);
   mediaView.initSearchInput();
   mediaView.initClearButton(() => {
+    paginationController?.abort();
+    searchController?.abort();
+    state.currentQuery = "";
+    state.isLoading = false;
+    mediaView.hidePaginationLoader();
+    mediaView.hideMediaFilters();
     mediaView.clearSearchResults();
     mediaCarouselView.show();
   });
